@@ -138,21 +138,18 @@ export class AuthService {
     }
     
     async createUser(userDetails: CreateUserDto) {
-        // const newUser = this.userRepository.create({
-        //   ...userDetails,
-        //   createdAt: new Date(),
-        // });
-        // return this.userRepository.save(newUser);
-        return userDetails;
+        const newUser = this.userRepository.create({
+          ...userDetails,
+          created_at: new Date(),
+        });
+        return this.userRepository.save(newUser);
     }
     
     async createUserProfile(user_id: number, userProfileDetails: CreateUserProfileDto) {
-        // const newUserProfile = this.userProfileRepository.create({
-        //   ...userProfileDetails,
-        // });
-        // return this.userProfileRepository.save(newUserProfile);
-
-        return userProfileDetails;
+        const newUserProfile = this.userProfileRepository.create({
+          ...userProfileDetails,
+        });
+        return this.userProfileRepository.save(newUserProfile);
     }
 
     async checkUserAccountEmailExists(email: string): Promise<void> {

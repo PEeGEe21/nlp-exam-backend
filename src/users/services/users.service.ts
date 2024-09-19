@@ -12,23 +12,6 @@ export class UsersService {
         @InjectRepository(User) private userRepository: Repository<User>,
         @InjectRepository(Profile) private profileRepository: Repository<Profile>,        
     ) {}
-
-      
-    // private readonly users = [
-    //     {
-    //       id: 1,
-    //       username: 'john',
-    //       email: 'john',
-    //       password: 'changeme',
-    //     },
-    //     {
-    //       id: 2,
-    //       username: 'maria',
-    //       email: 'maria',
-    //       password: 'guess',
-    //     },
-    // ];
-
       
     // async findOne(username: string): Promise<User | undefined> {
     //     return this.users.find(user => user.username === username);
@@ -41,7 +24,6 @@ export class UsersService {
     }
 
     async getUserAccountPassword(email: string): Promise<string | undefined> {
-        // const user = this.users.find(user => user.email === email);
         const user = await this.userRepository.findOneBy({ email });
         return user?.password;
     }
