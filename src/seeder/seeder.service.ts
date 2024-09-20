@@ -26,8 +26,6 @@ export class SeederService {
 
   ) {}
 
-
-
   async seedOptionTypes() {
     const difficulties = [
       { id: 1, title: 'MUlti Choice', description: null },
@@ -102,7 +100,7 @@ export class SeederService {
       },
       {
         id: 3,
-        userId: 3,
+        userId: 2,
         difficultyId: 4,
         optionTypeId: 1,
         question: "Which planet is known as the Red Planet?",
@@ -122,8 +120,6 @@ export class SeederService {
       const existingQuestion = await this.questionRepository.findOne({ where: { id: question.id } });
 
       const user = await this.usersService.getUserAccountById(question.userId)
-
-      
       
       const difficultyType = await this.difficultyService.getProjectById(question.difficultyId)
 
@@ -163,8 +159,8 @@ export class SeederService {
 
   async createAnswers(question, newQuestion){
     for (const answer of question.answers) {
-      const existingAnswer = await this.answerRepository.findOne({ where: { id: answer.id } });
-      if (!existingAnswer) {
+      // const existingAnswer = await this.answerRepository.findOne({ where: { id: answer.id } });
+      // if (!existingAnswer) {
         const newAnswer = this.answerRepository.create({
           question: newQuestion,
           isCorrect: answer.isCorrect ? 1 : 0,
@@ -174,9 +170,8 @@ export class SeederService {
         });
           
         await this.answerRepository.save(newAnswer);
-      }
+      // }
     }
   }
-
 
 }
