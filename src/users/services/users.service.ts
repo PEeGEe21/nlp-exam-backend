@@ -22,6 +22,10 @@ export class UsersService {
         const user = await this.userRepository.findOneBy({ email });    
         return user;
     }
+    async getUserAccountById(id: number) {
+        const user = await this.userRepository.findOneBy({ id });    
+        return user;
+    }
 
     async getUserAccountPassword(email: string): Promise<string | undefined> {
         const user = await this.userRepository.findOneBy({ email });
@@ -33,6 +37,7 @@ export class UsersService {
         if (user) return true;
         return false;
     }
+
     
 
     

@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/services/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { EmailLoginDto } from '../dtos/email-login.dto';
@@ -11,6 +11,8 @@ import { User } from 'src/typeorm/entities/User';
 import { Repository } from 'typeorm';
 import { Profile } from 'src/typeorm/entities/Profile';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Student } from 'src/typeorm/entities/Student';
+import { CreateStudentDto } from '../dtos/create-user-student.dto';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +23,7 @@ export class AuthService {
 
         @InjectRepository(User) private userRepository: Repository<User>,
         @InjectRepository(Profile) private userProfileRepository: Repository<Profile>,
+        @InjectRepository(Student) private studentRepository: Repository<Student>,
     ) {}
 
     async signIn(loginDto: EmailLoginDto): Promise<LoginResponseDto> {
@@ -109,7 +112,10 @@ export class AuthService {
         };
     
         const userProfileDetails = await this.createUserProfile(user.id, userprofilepayload)
+
+        const student = await this.createUserStudent(user);
     
+        await this.updateUserProfile(user.id,userProfileDetails)
         const payload = {
           email: user.email,
           sub: user.id,
@@ -117,7 +123,7 @@ export class AuthService {
         user.profile = userProfileDetails
         const profile = userProfileDetails
     
-        console.log(profile, 'profile details')
+        console.log(profile, student, 'profile details')
         // if (config.env === 'production') {
         //   const data = {
         //     env: 'Production',
@@ -132,7 +138,7 @@ export class AuthService {
           success: "success",
           access_token: this.jwtService.sign(payload),
           user,
-          profile:profile,
+          // profile:profile,
           message: 'Account was successfully created',
         };
     }
@@ -144,12 +150,27 @@ export class AuthService {
         });
         return this.userRepository.save(newUser);
     }
+
+    async updateUserProfile(id: number, profile: Profile) {
+      const user = await this.usersService.getUserAccountById(id);
+      user.profile = profile;
+
+      return this.userRepository.save(user);
+  }
     
     async createUserProfile(user_id: number, userProfileDetails: CreateUserProfileDto) {
         const newUserProfile = this.userProfileRepository.create({
           ...userProfileDetails,
         });
         return this.userProfileRepository.save(newUserProfile);
+    }
+
+    async createUserStudent(user) {
+        const newStudent = this.studentRepository.create({
+          user,
+        });
+
+        return this.studentRepository.save(newStudent);
     }
 
     async checkUserAccountEmailExists(email: string): Promise<void> {
