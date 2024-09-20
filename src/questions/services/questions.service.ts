@@ -11,7 +11,7 @@ export class QuestionsService {
     constructor(
         @InjectRepository(User) private userRepository: Repository<User>,
         @InjectRepository(DifficultyType) private difficultyRepository: Repository<DifficultyType>,
-        @InjectRepository(DifficultyType) private questions: Repository<Question>,
+        @InjectRepository(Question) private questions: Repository<Question>,
 
     ) {}
 

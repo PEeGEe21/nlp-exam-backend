@@ -26,6 +26,7 @@ import { DifficultyTypesService } from './difficulty-types/services/difficulty-t
 import { DifficultyTypesModule } from './difficulty-types/difficulty-types.module';
 import { SeederService } from './seeder/seeder.service';
 import { Answer } from './typeorm/entities/Answer';
+import { OptionTypesModule } from './option-types/option-types.module';
 
 @Module({
   imports: [
@@ -43,7 +44,7 @@ import { Answer } from './typeorm/entities/Answer';
     }),
     TypeOrmModule.forFeature([User, Profile, DifficultyType, Question, Result, QuestionTest, ResultsScore, Test, Student, OptionType, DifficultyType, Answer]), // Ensure Role is added here
     AuthModule, 
-    UsersModule, TestsModule, QuestionsModule, TestsModule, ResultsModule, DifficultyTypesModule
+    UsersModule, TestsModule, QuestionsModule, TestsModule, ResultsModule, DifficultyTypesModule, OptionTypesModule
   ],
   controllers: [AppController],
   providers: [AppService, SeederService],

@@ -34,6 +34,7 @@ async function bootstrap() {
 
   const seederService = app.get(SeederService);
   await seederService.seedDifficulties();
+  await seederService.seedOptionTypes();
   await seederService.seedQuestions();
 
   const port = process.env.PORT || config.port;

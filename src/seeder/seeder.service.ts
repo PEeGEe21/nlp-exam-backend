@@ -1,20 +1,53 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DifficultyTypesService } from 'src/difficulty-types/services/difficulty-types.service';
+import { OptionTypesService } from 'src/option-types/services/option-types.service';
 import { Answer } from 'src/typeorm/entities/Answer';
 import { DifficultyType } from 'src/typeorm/entities/DifficultyType';
+import { OptionType } from 'src/typeorm/entities/OptionType';
 import { Question } from 'src/typeorm/entities/Question';
+import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class SeederService {
   constructor(
-    @InjectRepository(DifficultyType)
-    private readonly difficultyRepository: Repository<DifficultyType>,
-    @InjectRepository(DifficultyType)
-    private readonly questionRepository: Repository<Question>,
-    @InjectRepository(DifficultyType)
-    private readonly answerRepository: Repository<Answer>,
+
+    // export the service
+    private usersService: UsersService,
+    private difficultyService: DifficultyTypesService,
+    private optionService: OptionTypesService,
+
+    @InjectRepository(DifficultyType) private readonly difficultyRepository: Repository<DifficultyType>,
+    @InjectRepository(OptionType) private readonly optionTypeRepository: Repository<OptionType>,
+    @InjectRepository(Question) private readonly questionRepository: Repository<Question>,
+    @InjectRepository(Answer) private readonly answerRepository: Repository<Answer>,
+
+
   ) {}
+
+
+
+  async seedOptionTypes() {
+    const difficulties = [
+      { id: 1, title: 'MUlti Choice', description: null },
+    ];
+
+    for (const difficulty of difficulties) {
+      const existingDifficulty = await this.optionTypeRepository.findOne({ where: { id: difficulty.id } });
+      if (!existingDifficulty) {
+        const newDifficulty = this.optionTypeRepository.create({
+          ...difficulty,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+        await this.optionTypeRepository.save(newDifficulty);
+        // console.log(`Difficulty ${difficulty.title} has been seeded`);
+      }
+    }
+
+    // console.log('Difficulties seeding completed');
+  }
 
   async seedDifficulties() {
     const difficulties = [
@@ -34,11 +67,11 @@ export class SeederService {
           updatedAt: new Date(),
         });
         await this.difficultyRepository.save(newDifficulty);
-        console.log(`Difficulty ${difficulty.title} has been seeded`);
+        // console.log(`Difficulty ${difficulty.title} has been seeded`);
       }
     }
 
-    console.log('Difficulties seeding completed');
+    // console.log('Difficulties seeding completed');
   }
 
   async seedQuestions() {
@@ -46,8 +79,8 @@ export class SeederService {
       {
         id: 1,
         userId: 2,
+        difficultyId: 3,
         optionTypeId: 1,
-        difficultyId: 1,
         question: "What is the capital of France?",
         answers: [
           { id: 1, content: "Paris", isCorrect: true },
@@ -59,8 +92,8 @@ export class SeederService {
       {
         id: 2,
         userId: 1,
+        difficultyId: 3,
         optionTypeId: 1,
-        difficultyId: 1,
         question: "The Earth is flat.",
         answers: [
           { id: 1, content: "True", isCorrect: false },
@@ -70,8 +103,8 @@ export class SeederService {
       {
         id: 3,
         userId: 3,
+        difficultyId: 4,
         optionTypeId: 1,
-        difficultyId: 2,
         question: "Which planet is known as the Red Planet?",
         answers: [
           { id: 1, content: "Mars", isCorrect: true },
@@ -82,27 +115,50 @@ export class SeederService {
       },
     ];
 
+    // console.log(questions, 'questions')
+
     for (const question of questions) {
+      console.log(question, 'ooon')
       const existingQuestion = await this.questionRepository.findOne({ where: { id: question.id } });
+
+      const user = await this.usersService.getUserAccountById(question.userId)
+
+      
+      
+      const difficultyType = await this.difficultyService.getProjectById(question.difficultyId)
+
+      // const optionType = null;
+      const optionType = await this.optionService.getOptionTypeById(question.optionTypeId)
+
+      // console.log(difficultyType.project.id, existingQuestion, optionType, difficultyType, 'exists')
       if (!existingQuestion) {
         const newQuestion = this.questionRepository.create({
-          userId: question.userId,
-          difficultyId: question.difficultyId,
-          optionTypeId: question.optionTypeId,
+          // id: question.id,
+          userId: user.id,
+          difficultyId: difficultyType.project.id,
+          optionTypeId: optionType.project.id,
+          isEditor: null,
           question: question.question,
+          questionPlain: null,
+          marks: Number(0),
+          instruction: null,
+          // ...question,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
 
+        // console.log(newQuestion, 'newQuestion')
+
         const newNewQuestion = await this.questionRepository.save(newQuestion);
 
+      //   console.log(newNewQuestion, 'knn')
         await this.createAnswers(question, newNewQuestion);
 
         console.log(`Question ${question.question} has been seeded`);
       }
     }
 
-    console.log('Questions seeding completed');
+    // console.log('Questions seeding completed');
   }
 
   async createAnswers(question, newQuestion){
@@ -121,4 +177,6 @@ export class SeederService {
       }
     }
   }
+
+
 }

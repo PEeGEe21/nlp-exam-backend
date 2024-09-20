@@ -8,14 +8,20 @@ import { Profile } from 'src/typeorm/entities/Profile';
 import { DifficultyType } from 'src/typeorm/entities/DifficultyType';
 import { Question } from 'src/typeorm/entities/Question';
 import { DifficultyTypesModule } from 'src/difficulty-types/difficulty-types.module';
+import { Answer } from 'src/typeorm/entities/Answer';
+import { SeederService } from 'src/seeder/seeder.service';
+import { OptionTypesModule } from 'src/option-types/option-types.module';
+import { OptionType } from 'src/typeorm/entities/OptionType';
 
 @Module({
   imports: [
     UsersModule,
     DifficultyTypesModule,
-    TypeOrmModule.forFeature([User, Profile, DifficultyType, Question])
+    OptionTypesModule,
+    TypeOrmModule.forFeature([User, Profile, DifficultyType, Question, Answer, OptionType])
   ],
   providers: [QuestionsService],
-  controllers: [QuestionsController]
+  controllers: [QuestionsController],
+  exports: [QuestionsService],
 })
 export class QuestionsModule {}
