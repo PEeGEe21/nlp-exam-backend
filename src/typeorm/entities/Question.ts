@@ -30,7 +30,7 @@ import { Answer } from './Answer';
     @Column({ type: 'int', name: 'option_type_id', default: 1 })
     optionTypeId: number;
   
-    @Column({ type: 'int', name: 'is_editor', default: 0 })
+    @Column({ type: 'int', name: 'is_editor', default: 0, nullable: true })
     isEditor: number;
   
     @Column({ type: 'longtext' })
@@ -39,20 +39,20 @@ import { Answer } from './Answer';
     @Column({ type: 'longtext', name: 'question_plain', nullable: true })
     questionPlain: string;
   
-    @Column({ type: 'text', nullable: true })
-    tags: string;
+    // @Column({ type: 'text', nullable: true })
+    // tags: string;
   
-    @Column({ type: 'double', default: 0 })
+    @Column({ type: 'double', default: 0, nullable: true })
     marks: number;
   
     @Column({ type: 'longtext', nullable: true })
     instruction: string;
   
-    @Column({ type: 'int', name: 'option_answer_type_id', default: 1 })
+    @Column({ type: 'int', name: 'option_answer_type_id', default: 1, nullable: true })
     optionAnswerTypeId: number;
   
-    @Column({ type: 'boolean', name: 'is_exam', default: false })
-    isExam: boolean;
+    // @Column({ type: 'boolean', name: 'is_exam', default: false })
+    // isExam: boolean;
   
     @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
     createdAt: Date;
@@ -75,7 +75,6 @@ import { Answer } from './Answer';
 
     @OneToMany(() => Answer, (answer) => answer.question)
     answers: Answer[];
-
 
   }
   

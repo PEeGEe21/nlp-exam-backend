@@ -41,7 +41,7 @@ import { Answer } from './typeorm/entities/Answer';
       synchronize: true,
       autoLoadEntities:true
     }),
-    TypeOrmModule.forFeature([User, Profile, DifficultyType]), // Ensure Role is added here
+    TypeOrmModule.forFeature([User, Profile, DifficultyType, Question, Result, QuestionTest, ResultsScore, Test, Student, OptionType, DifficultyType, Answer]), // Ensure Role is added here
     AuthModule, 
     UsersModule, TestsModule, QuestionsModule, TestsModule, ResultsModule, DifficultyTypesModule
   ],

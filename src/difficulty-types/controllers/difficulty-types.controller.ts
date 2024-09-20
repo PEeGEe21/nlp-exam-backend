@@ -9,4 +9,14 @@ export class DifficultyTypesController {
     getTasks() {
       return this.difficultyTypesService.findDifficulties();
     }
+
+    @Get('/all-difficulties')
+    getAllDifficulties() {
+      return this.difficultyTypesService.findDifficulties();
+    }
+
+    @Get(':id')
+    getProject(@Param('id', ParseIntPipe) id: number) {
+    return this.difficultyTypesService.getProjectById(id);
+  }
 }

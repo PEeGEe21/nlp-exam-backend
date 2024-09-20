@@ -5,7 +5,6 @@ import { Question } from './Question';
 // @Index('index_answer', ['questionId'])
 export class Answer {
 
-   
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -16,7 +15,7 @@ export class Answer {
     isCorrect: number;
 
     @Column({ type: 'longtext' })
-    value: string;
+    content: string;
 
     @CreateDateColumn({name:'created_at'})
     createdAt: Date;
