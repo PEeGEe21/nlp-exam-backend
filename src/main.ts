@@ -33,9 +33,9 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
 
   const seederService = app.get(SeederService);
-  await seederService.seedDifficulties();
-  await seederService.seedOptionTypes();
-  await seederService.seedQuestions();
+  // await seederService.seedDifficulties();
+  // await seederService.seedOptionTypes();
+  // await seederService.seedQuestions();
 
   const port = process.env.PORT || config.port;
   await app.listen(port);

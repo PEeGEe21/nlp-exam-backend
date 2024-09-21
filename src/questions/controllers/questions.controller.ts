@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put } from '@nestjs/common';
 import { QuestionsService } from '../services/questions.service';
 import { Question } from 'src/typeorm/entities/Question';
 
@@ -21,7 +21,7 @@ export class QuestionsController {
         return this.questionService.createQuestion(questionData);
     }
 
-    @Patch('/edit/:id')
+    @Put('/edit/:id')
     async partialUpdateQuestion(
         @Param('id', ParseIntPipe) id: number,
         @Body() questionData: Partial<Question>
@@ -32,5 +32,10 @@ export class QuestionsController {
     @Delete(':id')
     deleteQuestion(@Param('id', ParseIntPipe) id: number) {
         return this.questionService.deleteQuestion(id);
+    }
+
+    @Delete('/answer/:id')
+    deleteAnswer(@Param('id', ParseIntPipe) id: number) {
+        return this.questionService.deleteAnswer(id);
     }
 }

@@ -98,111 +98,169 @@ export class QuestionsService {
         }
     }
 
-    async updateQuestion(id: number, questionData: Partial<Question>): Promise<any> {
-        const question = await this.questionsRepository.findOne({ 
-            where: { id },
-            relations: ['answers'],
-        });
+    // async updateQuestion(id: number, questionData: Partial<Question>): Promise<any> {
+    //     const question = await this.questionsRepository.findOne({ 
+    //         where: { id },
+    //         relations: ['answers'],
+    //     });
 
-        if (!question) {
-            throw new NotFoundException('Question not found');
-        }
+    //     if (!question) {
+    //         throw new NotFoundException('Question not found');
+    //     }
 
-        // Object.assign(question, questionData);
-        // the update instead of save, build the items instead of the spread;
-         const saveNewQuestion = this.questionsRepository.save(question);
+    //     const saveNewQuestion = this.questionsRepository.save(question);
 
-        if (questionData.answers) {
-            // const existingAnswersMap = new Map<number, Answer>();
-            // question.answers.forEach(answer => existingAnswersMap.set(answer.id, answer));
+    //     if (questionData.answers) {
 
-            for (const answerData of questionData.answers) {
-                if(answerData.id){
-                    const existingAnswer =  await this.answersRepository.findOne({
-                        where: { id : answerData.id},
-                    });
-                    if (existingAnswer) {
-                        const id = answerData.id;
-                        // Object.assign(existingAnswer, answerData);
-                        const newAnswer = this.answersRepository.update({id}, {
-                            question: question,
-                            isCorrect: answerData.isCorrect ? 1 : 0,
-                            content: answerData.content,
-                            createdAt: new Date(),
-                            updatedAt: new Date(),
-                        });
-                        // await this.answersRepository.save(newAnswer);
-                    } else {
+    //         for (const answerData of questionData.answers) {
+    //             if(answerData.id){
+    //                 const existingAnswer =  await this.answersRepository.findOne({
+    //                     where: { id : answerData.id},
+    //                 });
+    //                 if (existingAnswer) {
+    //                     const id = answerData.id;
+    //                     const newAnswer = this.answersRepository.update({id}, {
+    //                         question: question,
+    //                         isCorrect: answerData.isCorrect ? 1 : 0,
+    //                         content: answerData.content,
+    //                         createdAt: new Date(),
+    //                         updatedAt: new Date(),
+    //                     });
+    //                 } else {
 
-                        const newAnswer = this.answersRepository.create({
-                            question: question,
-                            isCorrect: answerData.isCorrect ? 1 : 0,
-                            content: answerData.content,
-                            createdAt: new Date(),
-                            updatedAt: new Date(),
-                        });
+    //                     const newAnswer = this.answersRepository.create({
+    //                         question: question,
+    //                         isCorrect: answerData.isCorrect ? 1 : 0,
+    //                         content: answerData.content,
+    //                         createdAt: new Date(),
+    //                         updatedAt: new Date(),
+    //                     });
 
-                        // const newAnswer = this.answersRepository.create({
-                        //     ...answerData,
-                        //     question
-                        // });
-                        await this.answersRepository.save(newAnswer);
-                    }
-                } else{
+    //                     await this.answersRepository.save(newAnswer);
+    //                 }
+    //             } else{
 
-                    const newAnswer = this.answersRepository.create({
-                        question: question,
-                        isCorrect: answerData.isCorrect ? 1 : 0,
-                        content: answerData.content,
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                    });
+    //                 const newAnswer = this.answersRepository.create({
+    //                     question: question,
+    //                     isCorrect: answerData.isCorrect ? 1 : 0,
+    //                     content: answerData.content,
+    //                     createdAt: new Date(),
+    //                     updatedAt: new Date(),
+    //                 });
 
-                    // const newAnswer = this.answersRepository.create({
-                    //     ...answerData,
-                    //     question
-                    // });
-                    await this.answersRepository.save(newAnswer);
-                }
-            }
-        }
+    //                 await this.answersRepository.save(newAnswer);
+    //             }
+    //         }
+    //     }
 
-        return { success: 'success', message: 'Question updated successfully'};
-    }
+    //     return { success: 'success', message: 'Question updated successfully'};
+    // }
     
-    async updateQuestion2(id: number, questionData: Partial<Question>): Promise<any> {
-        const question = await this.questionsRepository.findOne({ 
-            where: { id },
-            relations: ['answers'],
-        });
+    // async updateQuestion2(id: number, questionData: Partial<Question>): Promise<any> {
+    //     const question = await this.questionsRepository.findOne({ 
+    //         where: { id },
+    //         relations: ['answers'],
+    //     });
 
-        if (!question) {
-            throw new NotFoundException('Question not found');
-        }
+    //     if (!question) {
+    //         throw new NotFoundException('Question not found');
+    //     }
 
-        Object.assign(question, questionData);
+    //     Object.assign(question, questionData);
 
-        if (questionData.answers) {
-            const existingAnswersMap = new Map<number, Answer>();
-            question.answers.forEach(answer => existingAnswersMap.set(answer.id, answer));
+    //     if (questionData.answers) {
+    //         const existingAnswersMap = new Map<number, Answer>();
+    //         question.answers.forEach(answer => existingAnswersMap.set(answer.id, answer));
 
-            for (const answerData of questionData.answers) {
-                const existingAnswer = existingAnswersMap.get(answerData.id);
-                if (existingAnswer) {
-                    Object.assign(existingAnswer, answerData);
-                    await this.answersRepository.save(existingAnswer);
-                } else {
-                    const newAnswer = this.answersRepository.create({
-                        ...answerData,
-                        question
-                    });
-                    await this.answersRepository.save(newAnswer);
-                }
+    //         for (const answerData of questionData.answers) {
+    //             const existingAnswer = existingAnswersMap.get(answerData.id);
+    //             if (existingAnswer) {
+    //                 Object.assign(existingAnswer, answerData);
+    //                 await this.answersRepository.save(existingAnswer);
+    //             } else {
+    //                 const newAnswer = this.answersRepository.create({
+    //                     ...answerData,
+    //                     question
+    //                 });
+    //                 await this.answersRepository.save(newAnswer);
+    //             }
+    //         }
+    //     }
+
+    //     await this.questionsRepository.save(question);
+    //     return { success: 'success', message: 'Question updated successfully'};
+    // }
+
+    async updateQuestion(id: number, questionData: Partial<Question>): Promise<any> {
+        try{
+            const question = await this.questionsRepository.findOne({ 
+                where: { id },
+                relations: ['answers'],
+            });
+    
+            if (!question) {
+                throw new NotFoundException('Question not found');
             }
+    
+            const saveNewQuestion = await this.questionsRepository.update(
+                { id },
+                {   
+                    difficultyId: questionData.difficultyId,
+                    optionTypeId: questionData.optionTypeId,
+                    question: questionData.question,
+                },
+            ); 
+    
+            if(saveNewQuestion.affected == 1){
+                if (questionData.answers) {
+    
+                    for (const answerData of questionData.answers) {
+                        if(answerData.id){
+                            const existingAnswer =  await this.answersRepository.findOne({
+                                where: { id : answerData.id},
+                            });
+                            if (existingAnswer) {
+                                const id = answerData.id;
+                                const newAnswer = this.answersRepository.update({id}, {
+                                    isCorrect: answerData.isCorrect ? 1 : 0,
+                                    content: answerData.content,
+                                });
+                            } else {
+                                throw new NotFoundException('Answer not found');
+                            }
+                        } else{
+    
+                            const newAnswer = this.answersRepository.create({
+                                question: question,
+                                isCorrect: answerData.isCorrect ? 1 : 0,
+                                content: answerData.content,
+                                createdAt: new Date(),
+                                updatedAt: new Date(),
+                            });
+                            await this.answersRepository.save(newAnswer);
+                        }
+                    }
+                }
+                const updatedQuestions = await this.questionsRepository.findOne({
+                    where: { id },
+                    relations: ['answers'],
+                });
+            
+                return {
+                    success: 'success',
+                    message: 'Question updated successfully',
+                    data: updatedQuestions,
+                };
+            } else{
+                return { error: 'error', message: 'An error occurred'};
+            }
+        } catch (err){
+            let data = {
+                error: err.message,
+            };
+            return data;
         }
 
-        await this.questionsRepository.save(question);
-        return { success: 'success', message: 'Question updated successfully'};
     }
 
     async deleteQuestion(id: number): Promise<any> {
@@ -227,6 +285,28 @@ export class QuestionsService {
                 console.error('Error deleting Question:', err);
                 throw new HttpException(
                     'Error deleting Question',
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                );
+        }
+    }
+
+    async deleteAnswer(id: number): Promise<any> {
+        try {
+            const answer = await this.answersRepository.findOne({
+                where: { id },
+            });
+        
+            if (!answer) {
+                return { error: 'error', message: 'Answer not found' };
+            }
+
+            await this.answersRepository.delete(id);
+                    return { success: 'success', message: 'Answer deleted successfully' };
+
+        } catch (err) {
+                console.error('Error deleting Answer:', err);
+                throw new HttpException(
+                    'Error deleting Answer',
                     HttpStatus.INTERNAL_SERVER_ERROR,
                 );
         }
