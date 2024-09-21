@@ -24,7 +24,6 @@ export class Answer {
     updatedAt: Date;
 
     @ManyToOne(() => Question, question => question.answers)   
-
     @JoinColumn({ name: 'questionId' })
     question: Question;
     // @Column({ type: 'int', unsigned: true })

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DifficultyTypesService } from 'src/difficulty-types/services/difficulty-types.service';
 import { OptionTypesService } from 'src/option-types/services/option-types.service';
@@ -98,27 +98,65 @@ export class QuestionsService {
         }
     }
 
+    async updateQuestion(id: number, questionData: Partial<Question>): Promise<any> {
+        const question = await this.questionsRepository.findOne({ 
+            where: { id },
+            relations: ['answers'],
+        });
+
+        if (!question) {
+            throw new NotFoundException('Question not found');
+        }
+
+        Object.assign(question, questionData);
+
+        if (questionData.answers) {
+            const existingAnswersMap = new Map<number, Answer>();
+            question.answers.forEach(answer => existingAnswersMap.set(answer.id, answer));
+
+            for (const answerData of questionData.answers) {
+                const existingAnswer = existingAnswersMap.get(answerData.id);
+                if (existingAnswer) {
+                    Object.assign(existingAnswer, answerData);
+                    await this.answersRepository.save(existingAnswer);
+                } else {
+                    const newAnswer = this.answersRepository.create({
+                        ...answerData,
+                        question
+                    });
+                    await this.answersRepository.save(newAnswer);
+                }
+            }
+        }
+
+        await this.questionsRepository.save(question);
+        return { success: 'success', message: 'Question updated successfully'};
+    }
+
     async deleteQuestion(id: number): Promise<any> {
         try {
-          const question = await this.questionsRepository.findOne({
-            where: { id: id },
-          });
-    
-          if (!question) {
-            console.log(question, 'woejowe');
-            // throw new HttpException('Question doesnt exist', HttpStatus.INTERNAL_SERVER_ERROR);
-            return { error: 'error', message: 'Question not found' }; // Or throw a NotFoundException
-          }
-    
-          const deletedQuestion = await this.questionsRepository.delete(id);
-    
-          return { success: 'success', message: 'Question deleted successfully' };
+            const question = await this.questionsRepository.findOne({
+                where: { id },
+                relations: ['answers'],
+            });
+        
+            if (!question) {
+                return { error: 'error', message: 'Question not found' };
+            }
+
+            if (question.answers && question.answers.length > 0) {
+                await this.answersRepository.delete({ question: { id } });
+            }
+        
+            await this.questionsRepository.delete(id);
+            return { success: 'success', message: 'Question deleted successfully' };
+
         } catch (err) {
-          console.error('Error deleting Question:', err);
-          throw new HttpException(
-            'Error deleting Question',
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
+                console.error('Error deleting Question:', err);
+                throw new HttpException(
+                    'Error deleting Question',
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                );
         }
-      }
+    }
 }
