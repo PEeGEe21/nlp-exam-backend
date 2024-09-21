@@ -21,7 +21,7 @@ export class QuestionsController {
         return this.questionService.createQuestion(questionData);
     }
 
-    @Post(':id')
+    @Post('/delete/:id')
     deleteQuestion(@Param('id', ParseIntPipe) id: number) {
       return this.questionService.deleteQuestion(id);
     }
