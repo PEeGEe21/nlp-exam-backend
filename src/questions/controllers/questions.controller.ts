@@ -20,4 +20,9 @@ export class QuestionsController {
     createQuestion(@Body() questionData: Partial<Question>) {
         return this.questionService.createQuestion(questionData);
     }
+
+    @Post(':id')
+    deleteQuestion(@Param('id', ParseIntPipe) id: number) {
+      return this.questionService.deleteQuestion(id);
+    }
 }

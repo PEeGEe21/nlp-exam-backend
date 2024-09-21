@@ -67,6 +67,8 @@ export class QuestionsService {
                 createdAt: new Date(),
                 updatedAt: new Date(),
             });
+
+            console.log(newQuestion, 'newQuestion')
             const saveNewQuestion = await this.questionsRepository.save(newQuestion);
             await this.createAnswers(questionData, saveNewQuestion);
             console.log(`Question ${questionData.question} has been created`);
@@ -95,4 +97,28 @@ export class QuestionsService {
             await this.answersRepository.save(newAnswer);
         }
     }
+
+    async deleteQuestion(id: number): Promise<any> {
+        try {
+          const question = await this.questionsRepository.findOne({
+            where: { id: id },
+          });
+    
+          if (!question) {
+            console.log(question, 'woejowe');
+            // throw new HttpException('Question doesnt exist', HttpStatus.INTERNAL_SERVER_ERROR);
+            return { error: 'error', message: 'Question not found' }; // Or throw a NotFoundException
+          }
+    
+          const deletedQuestion = await this.questionsRepository.delete(id);
+    
+          return { success: 'success', message: 'Question deleted successfully' };
+        } catch (err) {
+          console.error('Error deleting Question:', err);
+          throw new HttpException(
+            'Error deleting Question',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
+      }
 }
