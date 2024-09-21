@@ -24,10 +24,10 @@ import { Answer } from './Answer';
     @Column({ type: 'int', name: 'user_id' })
     userId: number;
   
-    @Column({ type: 'int', name: 'difficulty_id', nullable: true })
+    @Column({ type: 'int', name: 'difficulty_id' })
     difficultyId: number;
   
-    @Column({ type: 'int', name: 'option_type_id', nullable: true })
+    @Column({ type: 'int', name: 'option_type_id'})
     optionTypeId: number;
   
     @Column({ type: 'int', name: 'is_editor', default: 0, nullable: true })
