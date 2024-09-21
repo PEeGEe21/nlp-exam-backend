@@ -108,6 +108,78 @@ export class QuestionsService {
             throw new NotFoundException('Question not found');
         }
 
+        // Object.assign(question, questionData);
+        // the update instead of save, build the items instead of the spread;
+         const saveNewQuestion = this.questionsRepository.save(question);
+
+        if (questionData.answers) {
+            // const existingAnswersMap = new Map<number, Answer>();
+            // question.answers.forEach(answer => existingAnswersMap.set(answer.id, answer));
+
+            for (const answerData of questionData.answers) {
+                if(answerData.id){
+                    const existingAnswer =  await this.answersRepository.findOne({
+                        where: { id : answerData.id},
+                    });
+                    if (existingAnswer) {
+                        const id = answerData.id;
+                        // Object.assign(existingAnswer, answerData);
+                        const newAnswer = this.answersRepository.update({id}, {
+                            question: question,
+                            isCorrect: answerData.isCorrect ? 1 : 0,
+                            content: answerData.content,
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                        });
+                        // await this.answersRepository.save(newAnswer);
+                    } else {
+
+                        const newAnswer = this.answersRepository.create({
+                            question: question,
+                            isCorrect: answerData.isCorrect ? 1 : 0,
+                            content: answerData.content,
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                        });
+
+                        // const newAnswer = this.answersRepository.create({
+                        //     ...answerData,
+                        //     question
+                        // });
+                        await this.answersRepository.save(newAnswer);
+                    }
+                } else{
+
+                    const newAnswer = this.answersRepository.create({
+                        question: question,
+                        isCorrect: answerData.isCorrect ? 1 : 0,
+                        content: answerData.content,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    });
+
+                    // const newAnswer = this.answersRepository.create({
+                    //     ...answerData,
+                    //     question
+                    // });
+                    await this.answersRepository.save(newAnswer);
+                }
+            }
+        }
+
+        return { success: 'success', message: 'Question updated successfully'};
+    }
+    
+    async updateQuestion2(id: number, questionData: Partial<Question>): Promise<any> {
+        const question = await this.questionsRepository.findOne({ 
+            where: { id },
+            relations: ['answers'],
+        });
+
+        if (!question) {
+            throw new NotFoundException('Question not found');
+        }
+
         Object.assign(question, questionData);
 
         if (questionData.answers) {
