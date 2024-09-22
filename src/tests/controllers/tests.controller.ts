@@ -39,9 +39,9 @@ export class TestsController {
     getTasks(
       @Param('testId', ParseIntPipe) testId: number,
       @Param('questionId', ParseIntPipe) questionId: number,
-      @Body() questionTestData: Partial<QuestionTest>
+      @Body() is_added: any,
     ) {
-      return this.testsService.addQuestionTest(testId, questionId, questionTestData);
+      return this.testsService.addQuestionTest(testId, questionId, is_added);
     }
 
 

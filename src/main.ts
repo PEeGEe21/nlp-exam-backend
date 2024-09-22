@@ -36,6 +36,7 @@ async function bootstrap() {
   // await seederService.seedDifficulties();
   // await seederService.seedOptionTypes();
   // await seederService.seedQuestions();
+  // await seederService.seedTests();
 
   const port = process.env.PORT || config.port;
   await app.listen(port);

@@ -63,7 +63,7 @@ export class TestsService {
 
     }
 
-    async addQuestionTest(testId: number, questionId: number, questionTestData: Partial<QuestionTest>): Promise<any> {
+    async addQuestionTest(testId: number, questionId: number, is_added: any): Promise<any> {
         try{
             const test = await this.testsRepository.findOne({ where : { id: testId} });
         
@@ -74,16 +74,55 @@ export class TestsService {
               }
             }
         
-            const question = await this.questionsRepository.findOne({ where : { id: questionId} });
+            const question = await this.questionsRepository.findOne({ where : { id: questionId }, relations: ['questionTest'] });
         
-            const savedQuestionTest = await this.createQuestionTest(test, question, questionTestData);
+            const existingEntry = await this.questionsTestRepository.findOne({ where : { questionId: questionId, testId: testId} })
 
-            if(savedQuestionTest){
-                return {
-                    success:'success',
-                    message: 'Question Test saved successfully'
+            const is_question_test_added = is_added.is_added;
+            // console.log( is_added.is_added === 0, is_added.is_added, question, existingEntry )
+            // return;
+            if( is_question_test_added === 0 ){
+                if(!existingEntry){
+                    const savedQuestionTest = await this.createQuestionTest(test, question, question); 
+                    console.log(savedQuestionTest);
+                } 
+                else{
+                    const saveNewQuestion = await this.questionsTestRepository.update(
+                        { id: existingEntry.id },
+                        {   
+                            question: question.question,
+                            optionAnswerTypeId: question.optionTypeId,
+                            mark: question.marks??Number(0),
+                            instruction: question.instruction??null,
+                        },
+                    ); 
+                    if(saveNewQuestion.affected < 1){
+                        return {
+                            error:'error',
+                            message: 'An error has occurred'
+                        }
+                    }
                 }
             }
+
+            if(is_question_test_added === 1 && existingEntry){
+                await this.questionsTestRepository.delete(existingEntry.id);
+            }
+
+            console.log(question, question.questionTest, test.id)
+            const existingEntry2 = await this.questionsTestRepository.findOne({ where : { questionId: questionId, testId: testId} })
+
+            const questionData ={
+                ...question,
+                is_added: existingEntry2 ? true : false
+            }
+
+            return {
+                success: 'success',
+                question: questionData,
+                message: 'Question Test updated successfully'
+            }
+            
             
             
           } catch (err) {
@@ -101,12 +140,14 @@ export class TestsService {
             questionId: question.id,
             testId: test.id,
             question: question.question,
-            optionAnswerTypeId: question.optionAnswerTypeId,
-            mark: questionTestData.mark??Number(0),
-            instruction: questionTestData.marks??null,
+            optionAnswerTypeId: question.optionTypeId,
+            mark: questionTestData.marks??Number(0),
+            instruction: questionTestData.instruction??null,
             createdAt: new Date(),
             updatedAt: new Date(),
         });
+
+        console.log(newQuestionTest, 'newQuestionTest')
 
         const saveNewQuestionTest = await this.questionsTestRepository.save(newQuestionTest);
         if(saveNewQuestionTest)

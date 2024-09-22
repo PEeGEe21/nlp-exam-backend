@@ -31,16 +31,16 @@ export class Test {
   @Column({ type: 'int', name: 'result_published', default: 0 })
   resultPublished: number;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int',  default: 0 })
   shuffle: number;
 
   @Column({ type: 'int', name: 'shuffle_answer', default: 0 })
   shuffleAnswer: number;
 
-  @Column({ type: 'int', name: 'view_correct_answer' })
+  @Column({ type: 'int', name: 'view_correct_answer',  default: 0 })
   viewCorrectAnswer: number;
 
-  @Column({ type: 'int', name: 'auto_publish' })
+  @Column({ type: 'int', name: 'auto_publish',  default: 0 })
   autoPublish: number;
 
   @Column({ type: 'int', name: 'is_published', default: 0 })

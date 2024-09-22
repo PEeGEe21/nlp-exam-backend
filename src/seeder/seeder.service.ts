@@ -6,6 +6,7 @@ import { Answer } from 'src/typeorm/entities/Answer';
 import { DifficultyType } from 'src/typeorm/entities/DifficultyType';
 import { OptionType } from 'src/typeorm/entities/OptionType';
 import { Question } from 'src/typeorm/entities/Question';
+import { Test } from 'src/typeorm/entities/Test';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 
@@ -22,6 +23,7 @@ export class SeederService {
     @InjectRepository(OptionType) private readonly optionTypeRepository: Repository<OptionType>,
     @InjectRepository(Question) private readonly questionRepository: Repository<Question>,
     @InjectRepository(Answer) private readonly answerRepository: Repository<Answer>,
+    @InjectRepository(Test) private readonly testRepository: Repository<Test>,
 
 
   ) {}
@@ -170,6 +172,81 @@ export class SeederService {
         await this.answerRepository.save(newAnswer);
       // }
     }
+  }
+
+  async seedTests() {
+    const tests = [
+      {
+        id: 1,
+        userId: 3,
+        title: "Introduction to React",
+        code: "REACT101",
+        questionMark: 50,
+        description: "A basic introduction to React and its core concepts.",
+        startDateTime: { date: "2024-09-20", time: "09:00" },
+        endDateTime: { date: "2024-09-20", time: "12:00" },
+        duration: { hour: 3, min: 0 }
+      },
+      {
+        id: 2,
+        userId: 3,
+        title: "Advanced JavaScript",
+        code: "JS202",
+        questionMark: 70,
+        description: "Deep dive into advanced JavaScript topics including closures, promises, and async/await.",
+        startDateTime: { date: "2024-10-05", time: "14:00" },
+        endDateTime: { date: "2024-10-05", time: "15:00" },
+        duration: { hour: 3, min: 0 }
+      },
+      {
+        id: 3,
+        userId: 2,
+        title: "Database Management",
+        code: "DB301",
+        questionMark: 40,
+        description: "Understanding relational databases, SQL queries, and database design principles.",
+        startDateTime: { date: "2024-11-01", time: "10:00" },
+        endDateTime: { date: "2024-11-01", time: "13:00" },
+        duration: { hour: 3, min: 0 }
+      },
+      {
+        id: 4,
+        userId: 3,
+        title: "Introduction to Python",
+        code: "PYTHON101",
+        questionMark: 60,
+        description: "An introduction to Python programming including syntax, data structures, and basic algorithms.",
+        startDateTime: { date: "2024-12-15", time: "08:00" },
+        endDateTime: { date: "2024-12-15", time: "11:00" },
+        duration: { hour: 3, min: 0 }
+      }
+    ];
+
+    for (const testData of tests) {
+      const existingTest = await this.testRepository.findOne({ where: { id: testData.id } });
+      const user = await this.usersService.getUserAccountById(testData.userId)
+
+      if (!existingTest) {
+        const newTest = this.testRepository.create({
+          userId: user.id,
+          title: testData.title,
+          code: testData.code,
+          totalMarks: testData.questionMark,
+          instructions: testData.description,
+          startDate: new Date(`${testData.startDateTime.date}T${testData.startDateTime.time}:00Z`),
+          endDate: new Date(`${testData.endDateTime.date}T${testData.endDateTime.time}:00Z`),
+          durationHours: testData.duration.hour,
+          durationMinutes: testData.duration.min,
+        });
+
+        await this.testRepository.save(newTest);
+        console.log(`Test ${testData.title} has been seeded`);
+      } else {
+        console.log(`Test ${testData.title} already exists`);
+      }
+    }
+
+    console.log('Test seeding completed');
   }
 
 }
