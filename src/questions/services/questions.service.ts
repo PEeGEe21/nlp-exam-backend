@@ -62,7 +62,7 @@ export class QuestionsService {
                 isEditor: null,
                 question: questionData.question,
                 questionPlain: null,
-                marks: Number(0),
+                marks: questionData.marks??Number(0),
                 instruction: null,
                 createdAt: new Date(),
                 updatedAt: new Date(),

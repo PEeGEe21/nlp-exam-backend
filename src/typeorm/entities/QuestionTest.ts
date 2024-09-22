@@ -25,39 +25,15 @@ import { Test } from './Test';
     @Column({ type: 'int', name: 'test_id' })
     testId: number;
   
-    @Column({ type: 'int', name: 'position_id', nullable: true })
-    positionId: number;
-  
-    @Column({ type: 'int', name: 'user_id', nullable: true })
-    userId: number;
-  
-    @Column({ type: 'int', name: 'difficulty_id', default: 1 })
-    difficultyId: number;
-  
-    @Column({ type: 'int', name: 'topic_id', nullable: true })
-    topicId: number;
-  
     @Column({ type: 'int', name: 'option_answer_type_id', nullable: true })
     optionAnswerTypeId: number;
-  
-    @Column({ type: 'int', name: 'option_type_id', default: 1 })
-    optionTypeId: number;
-  
-    @Column({ type: 'int', name: 'is_editor', default: 0 })
-    isEditor: number;
-  
-    @Column({ type: 'int', name: 'is_exam', default: 0 })
-    isExam: number;
-  
+
     @Column({ type: 'longtext', nullable: true })
     question: string;
   
-    @Column({ type: 'longtext', name: 'question_plain', nullable: true })
-    questionPlain: string;
-  
-    @Column({ type: 'text', nullable: true })
-    tags: string;
-  
+    // @Column({ type: 'longtext', name: 'question_plain', nullable: true })
+    // questionPlain: string;
+
     @Column({ type: 'longtext', nullable: true })
     instruction: string;
   
@@ -78,13 +54,9 @@ import { Test } from './Test';
     @ManyToOne(() => Question)
     @JoinColumn({ name: 'question_id' })
     questionRelation: Question;
-  
-    @ManyToOne(() => User)
-    @JoinColumn({ name: 'user_id' })
-    user: User;
-  
-    @ManyToOne(() => DifficultyType)
-    @JoinColumn({ name: 'difficulty_id' })
-    difficulty: DifficultyType;
+
+    // @ManyToOne(() => DifficultyType)
+    // @JoinColumn({ name: 'difficulty_id' })
+    // difficulty: DifficultyType;
 }
   

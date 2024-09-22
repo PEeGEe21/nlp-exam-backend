@@ -1,4 +1,54 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put } from '@nestjs/common';
+import { TestsService } from '../../tests/services/tests.service';
+import { Test } from 'src/typeorm/entities/Test';
+import { QuestionTest } from 'src/typeorm/entities/QuestionTest';
 
 @Controller('tests')
-export class TestsController {}
+export class TestsController {
+    constructor(private testsService: TestsService) {}
+
+    // @Get('/')
+    // getTestss() {
+    //     return this.testsService.getAllTests();
+    // }
+
+    // @Get('/:id')
+    // getTest(@Param('id', ParseIntPipe) id: number) {
+    // return this.testsService.getQuestionById(id);
+    // }
+
+    // @Post('/create')
+    // createTest(@Body() testData: Partial<Test>) {
+    //     return this.testsService.createTest(testData);
+    // }
+
+    // @Put('/edit/:id')
+    // async partialUpdateTest(
+    //     @Param('id', ParseIntPipe) id: number,
+    //     @Body() testData: Partial<Test>
+    // ) {
+    //     return this.testsService.updateTest(id, testData);
+    // }
+
+    // @Delete('/delete/:id')
+    // deleteQuestion(@Param('id', ParseIntPipe) id: number) {
+    //     return this.testsService.deleteQuestion(id);
+    // }
+
+    @Post('/add-question-to-test/:testId/:questionId')
+    getTasks(
+      @Param('testId', ParseIntPipe) testId: number,
+      @Param('questionId', ParseIntPipe) questionId: number,
+      @Body() questionTestData: Partial<QuestionTest>
+    ) {
+      return this.testsService.addQuestionTest(testId, questionId, questionTestData);
+    }
+
+
+    @Get('/question-assign-index/:testId')
+    getQuestionTestsAssign(
+      @Param('testId', ParseIntPipe) testId: number,
+    ) {
+      return this.testsService.getQuestionTestsAssign(testId);
+    }
+}

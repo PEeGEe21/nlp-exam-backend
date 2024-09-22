@@ -6,12 +6,12 @@ import { Question } from 'src/typeorm/entities/Question';
 export class QuestionsController {
     constructor(private questionService: QuestionsService) {}
 
-    @Get('/all')
+    @Get('/')
     getQuestions() {
         return this.questionService.getAllQuestions();
     }
 
-    @Get(':id')
+    @Get('/:id')
     getQuestion(@Param('id', ParseIntPipe) id: number) {
     return this.questionService.getQuestionById(id);
     }
@@ -29,12 +29,12 @@ export class QuestionsController {
         return this.questionService.updateQuestion(id, questionData);
     }
 
-    @Delete(':id')
+    @Delete('/delete/:id')
     deleteQuestion(@Param('id', ParseIntPipe) id: number) {
         return this.questionService.deleteQuestion(id);
     }
 
-    @Delete('/answer/:id')
+    @Delete('/answer/delete/:id')
     deleteAnswer(@Param('id', ParseIntPipe) id: number) {
         return this.questionService.deleteAnswer(id);
     }
