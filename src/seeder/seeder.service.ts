@@ -129,7 +129,6 @@ export class SeederService {
       // console.log(difficultyType.project.id, existingQuestion, optionType, difficultyType, 'exists')
       if (!existingQuestion) {
         const newQuestion = this.questionRepository.create({
-          // id: question.id,
           userId: user.id,
           difficultyId: difficultyType.project.id,
           optionTypeId: optionType.project.id,
@@ -138,7 +137,6 @@ export class SeederService {
           questionPlain: null,
           marks: Number(0),
           instruction: null,
-          // ...question,
           createdAt: new Date(),
           updatedAt: new Date(),
         });

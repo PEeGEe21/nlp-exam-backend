@@ -14,6 +14,7 @@ import { User } from './User';
 import { DifficultyType } from './DifficultyType';
 import { OptionType } from './OptionType';
 import { Answer } from './Answer';
+import { QuestionTest } from './QuestionTest';
 
   @Entity('questions')
   @Index('index_question', ['userId'])
@@ -24,10 +25,10 @@ import { Answer } from './Answer';
     @Column({ type: 'int', name: 'user_id' })
     userId: number;
   
-    @Column({ type: 'int', name: 'difficulty_id', nullable: true })
+    @Column({ type: 'int', name: 'difficulty_id' })
     difficultyId: number;
   
-    @Column({ type: 'int', name: 'option_type_id', nullable: true })
+    @Column({ type: 'int', name: 'option_type_id'})
     optionTypeId: number;
   
     @Column({ type: 'int', name: 'is_editor', default: 0, nullable: true })
@@ -47,6 +48,9 @@ import { Answer } from './Answer';
   
     @Column({ type: 'longtext', nullable: true })
     instruction: string;
+
+    @Column({ type: 'longtext', nullable: true })
+    answer_explanation: string;
   
     // @Column({ type: 'int', name: 'option_answer_type_id', default: 1, nullable: true })
     // optionAnswerTypeId: number;
@@ -64,6 +68,11 @@ import { Answer } from './Answer';
     // @OneToOne(() => User)
     // @JoinColumn({ name: 'user_id' })
     // user: User;
+
+    // Relationships
+    @OneToOne(() => QuestionTest)
+    @JoinColumn({ name: 'question_test_id' })
+    questionTest: QuestionTest;
   
     // @OneToOne(() => DifficultyType)
     // @JoinColumn({ name: 'difficulty_id' })
