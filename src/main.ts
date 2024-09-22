@@ -9,16 +9,16 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(new ValidationPipe());
-  const corsOptions = {
-    origin:
-      config.env === 'development'
-        ? '*'
-        : [
-            'https://nlp-exam-frontend.vercel.app',
-          ],
-    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-  };
-  app.enableCors(corsOptions); // TODO: Setup cors config based on FE's server IPs
+  // const corsOptions = {
+  //   origin:
+  //     config.env === 'development'
+  //       ? '*'
+  //       : [
+  //           'https://nlp-exam-frontend.vercel.app',
+  //         ],
+  //   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+  // };
+  app.enableCors(); // TODO: Setup cors config based on FE's server IPs
   // app.use(csurf());
   app.setGlobalPrefix('/api/');
   const swaggerConfig = new DocumentBuilder()
