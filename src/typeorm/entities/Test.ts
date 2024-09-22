@@ -16,10 +16,10 @@ export class Test {
   @Column({ type: 'double', name: 'mark_per_question', default: 0 })
   markPerQuestion: number;
 
-  @Column({ type: 'double', name: 'total_questions', default: 0 })
+  @Column({ type: 'double', name: 'total_questions', default: 0})
   totalQuestions: number;
 
-  @Column({ type: 'double', name: 'total_marks', default: 0 })
+  @Column({ type: 'double', name: 'total_marks', default: 0})
   totalMarks: number;
 
   @Column({ type: 'varchar', length: 255 })
@@ -28,7 +28,7 @@ export class Test {
   @Column({ type: 'varchar', length: 255 })
   code: string;
 
-  @Column({ type: 'int', name: 'result_published', default: 0 })
+  @Column({ type: 'int', name: 'result_published', default: 0})
   resultPublished: number;
 
   @Column({ type: 'int',  default: 0 })
@@ -55,13 +55,13 @@ export class Test {
   @Column({ type: 'timestamp', name: 'start_date', nullable: true })
   startDate: Date;
 
-  @Column({ type: 'timestamp', name: 'end_date', nullable: true })
+  @Column({ type: 'timestamp', name: 'end_date', nullable: true})
   endDate: Date;
 
   @Column({ type: 'int', name: 'type', default: 1 })
   type: number;
 
-  @Column({ type: 'longtext', nullable: true })
+  @Column({ type: 'longtext' })
   instructions: string;
 
   @Column({ type: 'int', name: 'is_random_questions', default: 0 })
