@@ -38,6 +38,7 @@ import { OptionTypesModule } from './option-types/option-types.module';
       username:  process.env.DATABASE_USERNAME,
       password:  process.env.DATABASE_PASSWORD,
       database:  process.env.DATABASE_NAME,
+      ssl: { rejectUnauthorized: false },
       entities: [User, Profile, Test, Question, QuestionTest, Result, ResultsScore, Student, OptionType, DifficultyType, Answer],
       synchronize: true,
       autoLoadEntities:true
