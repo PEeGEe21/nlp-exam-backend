@@ -39,7 +39,6 @@ export class TestsController {
       return this.testsService.addQuestionTest(testId, questionId, is_added);
     }
 
-
     @Get('/question-assign-index/:testId')
     getQuestionTestsAssign(
       @Param('testId', ParseIntPipe) testId: number,

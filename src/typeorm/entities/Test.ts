@@ -55,7 +55,7 @@ export class Test {
   @Column({ type: 'timestamp', name: 'start_date', nullable: true })
   startDate: Date;
 
-  @Column({ type: 'timestamp', name: 'end_date', nullable: true})
+  @Column({ type: 'timestamp', name: 'end_date', nullable: true })
   endDate: Date;
 
   @Column({ type: 'int', name: 'type', default: 1 })

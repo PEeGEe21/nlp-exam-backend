@@ -130,7 +130,7 @@ export class TestsService {
                 message: 'Test not found'
               }
             }
-        
+
             const question = await this.questionsRepository.findOne({ where : { id: questionId }, relations: ['questionTest'] });
         
             const existingEntry = await this.questionsTestRepository.findOne({ where : { questionId: questionId, testId: testId} })
