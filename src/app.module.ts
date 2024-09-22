@@ -32,12 +32,12 @@ import { OptionTypesModule } from './option-types/option-types.module';
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: config.db.type,
-      host: config.db.host,
-      port: config.db.port,
-      username: config.db.username,
-      password: config.db.password,
-      database: config.db.name,
+      type: 'mysql',
+      host: process.env.DATABASE_HOST,
+      port:  Number(process.env.DATABASE_PORT),
+      username:  process.env.DATABASE_USERNAME,
+      password:  process.env.DATABASE_PASSWORD,
+      database:  process.env.DATABASE_NAME,
       entities: [User, Profile, Test, Question, QuestionTest, Result, ResultsScore, Student, OptionType, DifficultyType, Answer],
       synchronize: true,
       autoLoadEntities:true
