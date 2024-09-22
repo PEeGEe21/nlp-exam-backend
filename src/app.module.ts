@@ -39,7 +39,9 @@ import { OptionTypesModule } from './option-types/option-types.module';
       password:  process.env.DATABASE_PASSWORD,
       database:  process.env.DATABASE_NAME,
       ssl: { rejectUnauthorized: false },
-      entities: [User, Profile, Test, Question, QuestionTest, Result, ResultsScore, Student, OptionType, DifficultyType, Answer],
+      entities: [__dirname + '/**/entity/*.entity{.ts,.js}'], 
+
+      // entities: [User, Profile, Test, Question, QuestionTest, Result, ResultsScore, Student, OptionType, DifficultyType, Answer],
       synchronize: true,
       autoLoadEntities:true
     }),
