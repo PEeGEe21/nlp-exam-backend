@@ -25,6 +25,63 @@ export class TestsService {
 
     ) {}
 
+    async getAllTests() {
+      const all_tests = await this.testsRepository.find();
+  
+      const res = {
+          success: 'success',
+          message: 'successful',
+          data: all_tests,
+      };
+
+      return res;
+    }
+
+    async getTestById(id: number): Promise<any | undefined> {
+      try {
+          const test = await this.testsRepository.findOneBy({ id });
+          if (!test)
+              throw new HttpException('Question not found', HttpStatus.BAD_REQUEST);
+      
+          let data = {
+              test,
+              success: 'success',
+          };
+          return data;
+      } catch (err) {}
+    }
+
+    async createTest(testData: Partial<Test>): Promise<any> {
+      const user = await this.usersService.getUserAccountById(testData.userId)
+  
+      try{
+          const newTest = this.testsRepository.create({
+              user: user,
+              markPerQuestion: testData.markPerQuestion,
+              title: testData.title,
+              code: testData.code,
+              durationHours: testData.durationHours,
+              durationMinutes: testData.durationMinutes,
+              instructions: testData.instructions,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+          });
+
+          console.log(newTest, 'newTest')
+          await this.testsRepository.save(newTest);
+          let data = {
+              success: 'success',
+          };
+          return data;
+
+      } catch (err) {
+          let data = {
+              error: err.message,
+          };
+          return data;
+      }
+    };
+
     async getQuestionTestsAssign(testId: number): Promise<any> {
         try{
             const test = await this.testsRepository.findOne({ where : { id: testId} });
@@ -114,4 +171,61 @@ export class TestsService {
         else 
             return false;
     }
+
+    async updateTest(id: number, testData: Partial<Test>): Promise<any> {
+      try{
+          const test = await this.testsRepository.findOne({ 
+              where: { id },
+          });
+  
+          if (!test) {
+              throw new NotFoundException('Exam not found');
+          }
+  
+          await this.testsRepository.update(
+              { id },
+              {   
+                instructions: testData.instructions,
+              },
+          );
+
+          const updatedTest = await this.testsRepository.findOne({
+            where: { id },
+        });
+    
+        return {
+            success: 'success',
+            message: 'Test updated successfully',
+            data: updatedTest,
+        };
+
+      } catch (err){
+          let data = {
+              error: err.message,
+          };
+          return data;
+      }
+    }
+
+    async deleteTest(id: number): Promise<any> {
+      try {
+          const exam = await this.testsRepository.findOne({
+              where: { id },
+          });
+      
+          if (!exam) {
+              return { error: 'error', message: 'Exam not found' };
+          }
+
+          await this.testsRepository.delete(id);
+          return { success: 'success', message: 'Exam deleted successfully' };
+
+      } catch (err) {
+              console.error('Error deleting Exam:', err);
+              throw new HttpException(
+                  'Error deleting Exam',
+                  HttpStatus.INTERNAL_SERVER_ERROR,
+              );
+      }
+  }
 }

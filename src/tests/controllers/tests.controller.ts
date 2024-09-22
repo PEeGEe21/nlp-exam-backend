@@ -7,20 +7,20 @@ import { QuestionTest } from 'src/typeorm/entities/QuestionTest';
 export class TestsController {
     constructor(private testsService: TestsService) {}
 
-    // @Get('/')
-    // getTestss() {
-    //     return this.testsService.getAllTests();
-    // }
+    @Get('/all')
+    getTests() {
+        return this.testsService.getAllTests();
+    }
 
-    // @Get('/:id')
-    // getTest(@Param('id', ParseIntPipe) id: number) {
-    // return this.testsService.getQuestionById(id);
-    // }
+    @Get('/:id')
+    getTest(@Param('id', ParseIntPipe) id: number) {
+    return this.testsService.getTestById(id);
+    }
 
-    // @Post('/create')
-    // createTest(@Body() testData: Partial<Test>) {
-    //     return this.testsService.createTest(testData);
-    // }
+    @Post('/create')
+    createTest(@Body() testData: Partial<Test>) {
+        return this.testsService.createTest(testData);
+    }
 
     // @Put('/edit/:id')
     // async partialUpdateTest(
@@ -28,11 +28,6 @@ export class TestsController {
     //     @Body() testData: Partial<Test>
     // ) {
     //     return this.testsService.updateTest(id, testData);
-    // }
-
-    // @Delete('/delete/:id')
-    // deleteQuestion(@Param('id', ParseIntPipe) id: number) {
-    //     return this.testsService.deleteQuestion(id);
     // }
 
     @Post('/add-question-to-test/:testId/:questionId')
@@ -50,5 +45,18 @@ export class TestsController {
       @Param('testId', ParseIntPipe) testId: number,
     ) {
       return this.testsService.getQuestionTestsAssign(testId);
+    }
+
+    @Put('/edit/:id')
+    async partialUpdateQuestion(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() testData: Partial<Test>
+    ) {
+        return this.testsService.updateTest(id, testData);
+    }
+
+    @Delete('/delete/:id')
+    deleteQuestion(@Param('id', ParseIntPipe) id: number) {
+        return this.testsService.deleteTest(id);
     }
 }
