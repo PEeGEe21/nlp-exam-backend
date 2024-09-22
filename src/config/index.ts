@@ -11,15 +11,14 @@ const envVarsSchema = joi
     PORT: joi.number().default('5000'),
     NODE_ENV: joi
       .string()
-      .allow(...['development', 'staging', 'production'])
-      .required(),
+      .allow(...['development', 'staging', 'production']),
     DEVELOPMENT_START_COMMAND: joi.string().default('npm run start:dev'),
     LOG_LEVEL: joi
       .string()
       .allow(...['error', 'warning', 'info', 'debug', 'silly', ''])
       .default('silly'),
-    JWT_SECRET: joi.string().required(),
-    FRONTEND_URL: joi.string().required(),
+    JWT_SECRET: joi.string(),
+    FRONTEND_URL: joi.string(),
 
     // database config
     // MONGODB_URI: joi.string().required(),
