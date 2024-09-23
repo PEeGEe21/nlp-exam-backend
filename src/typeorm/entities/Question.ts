@@ -31,7 +31,7 @@ import { QuestionTest } from './QuestionTest';
     @Column({ type: 'int', name: 'option_type_id'})
     optionTypeId: number;
   
-    @Column({ type: 'int', name: 'is_editor', default: 0, nullable: true })
+    @Column({ type: 'int', name: 'is_editor', default: 0, nullable: true})
     isEditor: number;
   
     @Column({ type: 'longtext' })
@@ -43,7 +43,7 @@ import { QuestionTest } from './QuestionTest';
     // @Column({ type: 'text', nullable: true })
     // tags: string;
   
-    @Column({ type: 'double', default: 0, nullable: true })
+    @Column({ type: 'double', default: 0 })
     marks: number;
   
     @Column({ type: 'longtext', nullable: true })

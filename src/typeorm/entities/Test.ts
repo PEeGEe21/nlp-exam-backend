@@ -31,7 +31,7 @@ export class Test {
   @Column({ type: 'int', name: 'result_published', default: 0})
   resultPublished: number;
 
-  @Column({ type: 'int',  default: 0 })
+  @Column({ type: 'int',  default: 0})
   shuffle: number;
 
   @Column({ type: 'int', name: 'shuffle_answer', default: 0 })

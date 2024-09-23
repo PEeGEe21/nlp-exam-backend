@@ -70,7 +70,9 @@ export class QuestionsService {
 
             console.log(newQuestion, 'newQuestion')
             const saveNewQuestion = await this.questionsRepository.save(newQuestion);
-            await this.createAnswers(questionData, saveNewQuestion);
+            if (questionData.answers){
+                await this.createAnswers(questionData, saveNewQuestion);
+            }
             console.log(`Question ${questionData.question} has been created`);
             let data = {
                 success: 'success',
@@ -85,10 +87,10 @@ export class QuestionsService {
         }
     };
 
-    async createAnswers(questionData, saveNewQuestion){
-        for (const answer of questionData.answers) {
+    async createAnswers(data, question){
+        for (const answer of data.answers) {
             const newAnswer = this.answersRepository.create({
-                question: saveNewQuestion,
+                question: question,
                 isCorrect: answer.isCorrect ? 1 : 0,
                 content: answer.content,
                 createdAt: new Date(),
@@ -136,6 +138,7 @@ export class QuestionsService {
                                 throw new NotFoundException('Answer not found');
                             }
                         } else{
+                            // await this.createAnswers(answerData, question)
     
                             const newAnswer = this.answersRepository.create({
                                 question: question,
