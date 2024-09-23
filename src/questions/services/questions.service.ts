@@ -38,7 +38,11 @@ export class QuestionsService {
 
     async getQuestionById(id: number): Promise<any | undefined> {
         try {
-            const question = await this.questionsRepository.findOneBy({ id });
+            const question = await this.questionsRepository.findOne({
+                where: { id },
+                relations: ['answers'],
+            });
+
             if (!question)
                 throw new HttpException('Question not found', HttpStatus.BAD_REQUEST);
         
@@ -47,6 +51,7 @@ export class QuestionsService {
                 success: 'success',
             };
             return data;
+
         } catch (err) {}
     }
 
@@ -211,7 +216,7 @@ export class QuestionsService {
             }
 
             await this.answersRepository.delete(id);
-                    return { success: 'success', message: 'Answer deleted successfully' };
+            return { success: 'success', message: 'Answer deleted successfully' };
 
         } catch (err) {
                 console.error('Error deleting Answer:', err);
