@@ -161,11 +161,12 @@ export class QuestionsService {
                     relations: ['answers'],
                 });
             
-                return {
+                let data = {
                     success: 'success',
                     message: 'Question updated successfully',
                     data: updatedQuestions,
                 };
+                return data;
             } else{
                 return { error: 'error', message: 'An error occurred'};
             }
