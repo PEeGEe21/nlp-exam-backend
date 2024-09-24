@@ -11,10 +11,10 @@ export class Answer {
     // @Column({ type: 'int', unsigned: true })
     // questionId: number; // Ensure both columns are int and unsigned
 
-    @Column({ type: 'int', unsigned: true })
+    @Column({ type: 'int', unsigned: true})
     isCorrect: number;
 
-    @Column({ type: 'longtext' })
+    @Column({ type: 'longtext'})
     content: string;
 
     @CreateDateColumn({name:'created_at'})
@@ -26,6 +26,7 @@ export class Answer {
     @ManyToOne(() => Question, question => question.answers)   
     @JoinColumn({ name: 'questionId' })
     question: Question;
+
     // @Column({ type: 'int', unsigned: true })
     // questionId: number; // Ensure both columns are int and unsigned
 }

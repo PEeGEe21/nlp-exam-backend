@@ -151,13 +151,13 @@ export class QuestionsService {
                 if (questionData.answers) {
     
                     for (const answerData of questionData.answers) {
-                        if(answerData.id){
+                        if(answerData.id > 0){
                             const existingAnswer =  await this.answersRepository.findOne({
                                 where: { id : answerData.id},
                             });
                             if (existingAnswer) {
                                 const id = answerData.id;
-                                const newAnswer = this.answersRepository.update({id}, {
+                                await this.answersRepository.update({id}, {
                                     isCorrect: answerData.isCorrect ? 1 : 0,
                                     content: answerData.content,
                                 });
@@ -183,11 +183,12 @@ export class QuestionsService {
                     relations: ['answers'],
                 });
             
-                return {
+                let data = {
                     success: 'success',
                     message: 'Question updated successfully',
                     data: updatedQuestions,
                 };
+                return data;
             } else{
                 return { error: 'error', message: 'An error occurred'};
             }
@@ -222,7 +223,7 @@ export class QuestionsService {
                 console.error('Error deleting Question:', err);
                 throw new HttpException(
                     'Error deleting Question',
-                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR
                 );
         }
     }
