@@ -34,7 +34,7 @@ export class QuestionsController {
         return this.questionService.deleteQuestion(id);
     }
 
-    @Delete('/answer/delete/:id')
+    @Delete('/delete-answer/:id')
     deleteAnswer(@Param('id', ParseIntPipe) id: number) {
         return this.questionService.deleteAnswer(id);
     }
