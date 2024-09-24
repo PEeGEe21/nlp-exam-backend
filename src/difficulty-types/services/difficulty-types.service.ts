@@ -26,14 +26,14 @@ export class DifficultyTypesService {
         return res;
       }
 
-    async getProjectById(id: number): Promise<any | undefined> {
+    async getDifficultyById(id: number): Promise<any | undefined> {
         try {
-          const project = await this.difficultyRepository.findOneBy({ id });
-          if (!project)
+          const difficulty = await this.difficultyRepository.findOneBy({ id });
+          if (!difficulty)
             throw new HttpException('Project not found', HttpStatus.BAD_REQUEST);
     
           let data = {
-            project,
+            difficulty,
             success: 'success',
           };
           return data;

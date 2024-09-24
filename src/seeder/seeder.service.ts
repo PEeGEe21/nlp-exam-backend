@@ -123,7 +123,7 @@ export class SeederService {
 
       const user = await this.usersService.getUserAccountById(question.userId)
       
-      const difficultyType = await this.difficultyService.getProjectById(question.difficultyId)
+      const difficultyType = await this.difficultyService.getDifficultyById(question.difficultyId)
 
       // const optionType = null;
       const optionType = await this.optionService.getOptionTypeById(question.optionTypeId)

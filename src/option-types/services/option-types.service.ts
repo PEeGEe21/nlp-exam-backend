@@ -26,12 +26,12 @@ export class OptionTypesService {
 
     async getOptionTypeById(id: number): Promise<any | undefined> {
         try {
-          const project = await this.optionRepository.findOneBy({ id });
-          if (!project)
+          const optionType = await this.optionRepository.findOneBy({ id });
+          if (!optionType)
             throw new HttpException('Project not found', HttpStatus.BAD_REQUEST);
     
           let data = {
-            project,
+            optionType,
             success: 'success',
           };
           return data;

@@ -12,6 +12,7 @@ import { Answer } from 'src/typeorm/entities/Answer';
 import { SeederService } from 'src/seeder/seeder.service';
 import { OptionTypesModule } from 'src/option-types/option-types.module';
 import { OptionType } from 'src/typeorm/entities/OptionType';
+import { SanitizerService } from 'src/core/utils/SanitizerService';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { OptionType } from 'src/typeorm/entities/OptionType';
     OptionTypesModule,
     TypeOrmModule.forFeature([User, Profile, DifficultyType, Question, Answer, OptionType])
   ],
-  providers: [QuestionsService],
+  providers: [QuestionsService, SanitizerService],
   controllers: [QuestionsController],
   exports: [QuestionsService],
 })

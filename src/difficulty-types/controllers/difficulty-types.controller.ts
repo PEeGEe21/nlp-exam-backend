@@ -11,7 +11,7 @@ export class DifficultyTypesController {
     }
 
     @Get(':id')
-    getProject(@Param('id', ParseIntPipe) id: number) {
-    return this.difficultyTypesService.getProjectById(id);
+    getDifficultyById(@Param('id', ParseIntPipe) id: number) {
+    return this.difficultyTypesService.getDifficultyById(id);
   }
 }

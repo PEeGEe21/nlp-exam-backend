@@ -27,6 +27,7 @@ import { DifficultyTypesModule } from './difficulty-types/difficulty-types.modul
 import { SeederService } from './seeder/seeder.service';
 import { Answer } from './typeorm/entities/Answer';
 import { OptionTypesModule } from './option-types/option-types.module';
+import { SanitizerService } from './core/utils/SanitizerService';
 
 @Module({
   imports: [
@@ -50,6 +51,6 @@ import { OptionTypesModule } from './option-types/option-types.module';
     UsersModule, TestsModule, QuestionsModule, TestsModule, ResultsModule, DifficultyTypesModule, OptionTypesModule
   ],
   controllers: [AppController],
-  providers: [AppService, SeederService],
+  providers: [AppService, SeederService, SanitizerService],
 })
 export class AppModule {}

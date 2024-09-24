@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { SanitizerService } from 'src/core/utils/SanitizerService';
 import { DifficultyTypesService } from 'src/difficulty-types/services/difficulty-types.service';
 import { OptionTypesService } from 'src/option-types/services/option-types.service';
 import { Answer } from 'src/typeorm/entities/Answer';
@@ -16,6 +17,8 @@ export class QuestionsService {
         private usersService: UsersService,
         private difficultyService: DifficultyTypesService,
         private optionService: OptionTypesService,
+        private readonly sanitizerService: SanitizerService,
+
 
         @InjectRepository(DifficultyType) private difficultyRepository: Repository<DifficultyType>,
         @InjectRepository(Question) private questionsRepository: Repository<Question>,
@@ -25,7 +28,7 @@ export class QuestionsService {
     ) {}
 
     async getAllQuestions() {
-        const all_questions = await this.questionsRepository.find();
+        const all_questions = await this.questionsRepository.find({relations:['answers', 'difficulty', 'optionType']});
     
         const res = {
             success: 'success',
@@ -40,7 +43,7 @@ export class QuestionsService {
         try {
             const question = await this.questionsRepository.findOne({
                 where: { id },
-                relations: ['answers'],
+                relations: ['answers', 'difficulty', 'optionType'],
             });
 
             if (!question)
@@ -57,16 +60,35 @@ export class QuestionsService {
 
     async createQuestion(questionData: Partial<Question>): Promise<any> {
         const user = await this.usersService.getUserAccountById(questionData.userId)
-        const difficultyType = await this.difficultyService.getProjectById(questionData.difficultyId)
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        const difficultyType = await this.difficultyService.getDifficultyById(questionData.difficultyId)
+        if (!difficultyType) {
+            throw new NotFoundException('DifficultyType not found');
+        }
+
         const optionType = await this.optionService.getOptionTypeById(questionData.optionTypeId)
+        if (!optionType) {
+            throw new NotFoundException('OptionType not found');
+        }
+
+        // console.log(optionType, difficultyType)
+        const sanitizedQuestion = this.sanitizerService.sanitizeInput(questionData.question);
+
+        // console.log(sanitizedQuestion, questionData.question, 'questionData.question');
+        // return;
+
         try{
             const newQuestion = this.questionsRepository.create({
                 userId: user.id,
-                difficultyId: difficultyType.project.id,
-                optionTypeId: optionType.project.id,
+                difficultyId: difficultyType.difficulty.id,
+                optionTypeId: optionType.optionType.id,
                 isEditor: null,
                 question: questionData.question,
-                questionPlain: null,
+                questionPlain: sanitizedQuestion??null,
                 marks: questionData.marks??Number(0),
                 instruction: null,
                 createdAt: new Date(),

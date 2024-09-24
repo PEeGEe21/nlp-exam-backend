@@ -74,13 +74,13 @@ import { QuestionTest } from './QuestionTest';
     @JoinColumn({ name: 'question_test_id' })
     questionTest: QuestionTest;
   
-    // @OneToOne(() => DifficultyType)
-    // @JoinColumn({ name: 'difficulty_id' })
-    // difficulty: DifficultyType;
+    @ManyToOne(() => DifficultyType)
+    @JoinColumn({ name: 'difficulty_id' })
+    difficulty: DifficultyType;
   
-    // @OneToOne(() => OptionType)
-    // @JoinColumn({ name: 'option_type_id' })
-    // optionType: OptionType;
+    @ManyToOne(() => OptionType)
+    @JoinColumn({ name: 'option_type_id' })
+    optionType: OptionType;
 
     @OneToMany(() => Answer, (answer) => answer.question)
     answers: Answer[];
