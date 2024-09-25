@@ -22,14 +22,6 @@ export class TestsController {
         return this.testsService.createTest(testData);
     }
 
-    // @Put('/edit/:id')
-    // async partialUpdateTest(
-    //     @Param('id', ParseIntPipe) id: number,
-    //     @Body() testData: Partial<Test>
-    // ) {
-    //     return this.testsService.updateTest(id, testData);
-    // }
-
     @Post('/add-question-to-test/:testId/:questionId')
     getTasks(
       @Param('testId', ParseIntPipe) testId: number,

@@ -216,59 +216,67 @@ export class TestsService {
     }
 
     async updateTest(id: number, testData: Partial<Test>): Promise<any> {
-      try{
-          const test = await this.testsRepository.findOne({ 
-              where: { id },
-          });
+        try{
+            const test = await this.testsRepository.findOne({ 
+                where: { id },
+            });
   
-          if (!test) {
-              throw new NotFoundException('Exam not found');
-          }
+            if (!test) {
+                throw new NotFoundException('Exam not found');
+            }
   
-          await this.testsRepository.update(
-              { id },
-              {   
-                instructions: testData.instructions,
-              },
-          );
+            await this.testsRepository.update(
+                { id },
+                {   
+                    markPerQuestion: testData.markPerQuestion,
+                    title: testData.title,
+                    code: testData.code,
+                    durationHours: testData.durationHours,
+                    durationMinutes: testData.durationMinutes,
+                    instructions: testData.instructions,
+                    startDate: testData.startDate,
+                    endDate: testData.endDate,
+                },
+            );
 
-          const updatedTest = await this.testsRepository.findOne({
+            const updatedTest = await this.testsRepository.findOne({
             where: { id },
         });
     
-        return {
+        let data = {
             success: 'success',
             message: 'Test updated successfully',
             data: updatedTest,
         };
+        return data;
 
-      } catch (err){
-          let data = {
-              error: err.message,
-          };
-          return data;
-      }
+        } catch (err){
+            let data = {
+                error: err.message,
+            };
+            return data;
+        }
     }
 
     async deleteTest(id: number): Promise<any> {
-      try {
-          const exam = await this.testsRepository.findOne({
-              where: { id },
-          });
-      
-          if (!exam) {
-              return { error: 'error', message: 'Exam not found' };
-          }
+        try {
+            const exam = await this.testsRepository.findOne({
+                where: { id },
+            });
+        
+            if (!exam) {
+                return { error: 'error', message: 'Exam not found' };
+            }
 
-          await this.testsRepository.delete(id);
-          return { success: 'success', message: 'Exam deleted successfully' };
+            await this.testsRepository.delete(id);
+            return { success: 'success', message: 'Exam deleted successfully' };
 
-      } catch (err) {
-              console.error('Error deleting Exam:', err);
-              throw new HttpException(
-                  'Error deleting Exam',
-                  HttpStatus.INTERNAL_SERVER_ERROR,
-              );
-      }
+        } catch (err) {
+                console.error('Error deleting Exam:', err);
+                throw new HttpException(
+                    'Error deleting Exam',
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                );
+        }
   }
 }
