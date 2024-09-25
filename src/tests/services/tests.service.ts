@@ -63,6 +63,8 @@ export class TestsService {
               durationHours: testData.durationHours,
               durationMinutes: testData.durationMinutes,
               instructions: testData.instructions,
+              startDate: testData.startDate,
+              endDate: testData.endDate,
               createdAt: new Date(),
               updatedAt: new Date(),
           });
