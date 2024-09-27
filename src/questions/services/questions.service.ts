@@ -137,15 +137,24 @@ export class QuestionsService {
             if (!question) {
                 throw new NotFoundException('Question not found');
             }
+
+            const updatedFields = Object.keys(questionData).reduce((acc, key) => {
+                if (key !== 'answers' && questionData[key] !== undefined) {
+                    acc[key] = questionData[key];
+                }
+                return acc;
+            }, {});
+
+            const saveNewQuestion = await this.questionsRepository.update({ id }, updatedFields);
     
-            const saveNewQuestion = await this.questionsRepository.update(
-                { id },
-                {   
-                    difficultyId: questionData.difficultyId,
-                    optionTypeId: questionData.optionTypeId,
-                    question: questionData.question,
-                },
-            ); 
+            // const saveNewQuestion = await this.questionsRepository.update(
+            //     { id },
+            //     {   
+            //         difficultyId: questionData.difficultyId,
+            //         optionTypeId: questionData.optionTypeId,
+            //         question: questionData.question,
+            //     },
+            // ); 
     
             if(saveNewQuestion.affected == 1){
                 if (questionData.answers) {

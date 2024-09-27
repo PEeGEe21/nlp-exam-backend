@@ -21,7 +21,7 @@ export class QuestionsController {
         return this.questionService.createQuestion(questionData);
     }
 
-    @Put('/edit/:id')
+    @Patch('/edit/:id')
     async partialUpdateQuestion(
         @Param('id', ParseIntPipe) id: number,
         @Body() questionData: Partial<Question>
