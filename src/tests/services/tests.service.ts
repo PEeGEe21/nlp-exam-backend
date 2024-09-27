@@ -184,11 +184,11 @@ export class TestsService {
             
             
             
-          } catch (err) {
+        } catch (err) {
             console.log(err)
             return {
-              error: 'error',
-              message: 'An error occurred while sending project invites'
+                error: 'error',
+                message: 'An error occurred while sending project invites'
             }
         }
 
@@ -224,31 +224,26 @@ export class TestsService {
             if (!test) {
                 throw new NotFoundException('Exam not found');
             }
-  
-            await this.testsRepository.update(
-                { id },
-                {   
-                    markPerQuestion: testData.markPerQuestion,
-                    title: testData.title,
-                    code: testData.code,
-                    durationHours: testData.durationHours,
-                    durationMinutes: testData.durationMinutes,
-                    instructions: testData.instructions,
-                    startDate: testData.startDate,
-                    endDate: testData.endDate,
-                },
-            );
+
+            const updatedFields = Object.keys(testData).reduce((acc, key) => {
+                if (testData[key] !== undefined) {
+                    acc[key] = testData[key];
+                }
+                return acc;
+            }, {});
+    
+            await this.testsRepository.update({ id }, updatedFields);
 
             const updatedTest = await this.testsRepository.findOne({
             where: { id },
-        });
+            });
     
-        let data = {
-            success: 'success',
-            message: 'Test updated successfully',
-            data: updatedTest,
-        };
-        return data;
+            let data = {
+                success: 'success',
+                message: 'Test updated successfully',
+                data: updatedTest,
+            };
+            return data;
 
         } catch (err){
             let data = {

@@ -38,7 +38,7 @@ export class TestsController {
       return this.testsService.getQuestionTestsAssign(testId);
     }
 
-    @Put('/edit/:id')
+    @Patch('/edit/:id')
     async partialUpdateQuestion(
         @Param('id', ParseIntPipe) id: number,
         @Body() testData: Partial<Test>
