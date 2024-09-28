@@ -70,9 +70,12 @@ import { QuestionTest } from './QuestionTest';
     // user: User;
 
     // Relationships
-    @OneToOne(() => QuestionTest)
-    @JoinColumn({ name: 'question_test_id' })
-    questionTest: QuestionTest;
+    // @OneToMany(() => QuestionTest)
+    // @JoinColumn({ name: 'question_test_id' })
+    // questionTest: QuestionTest;
+    
+    @OneToMany(() => QuestionTest, questionTest => questionTest.questionRelation)
+    questionTests: QuestionTest[];
   
     @ManyToOne(() => DifficultyType)
     @JoinColumn({ name: 'difficulty_id' })

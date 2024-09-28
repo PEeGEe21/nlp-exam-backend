@@ -51,7 +51,10 @@ import { Test } from './Test';
     @JoinColumn({ name: 'test_id' })
     test: Test;
   
-    @ManyToOne(() => Question)
+    // @ManyToOne(() => Question)
+    // @JoinColumn({ name: 'question_id' })
+    // questionRelation: Question;
+    @ManyToOne(() => Question, question => question.questionTests)
     @JoinColumn({ name: 'question_id' })
     questionRelation: Question;
 

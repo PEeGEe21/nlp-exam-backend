@@ -26,8 +26,12 @@ export class TestsService {
     ) {}
 
     async getAllTests() {
-      const all_tests = await this.testsRepository.find();
+      const all_tests = await this.testsRepository.find({relations: ['user']});
   
+    //   const updatedQuestions = all_tests.map((question) => {
+    //         question.formatted_start_date = 
+    //     });
+
       const res = {
           success: 'success',
           message: 'successful',
@@ -95,17 +99,50 @@ export class TestsService {
               }
             }
         
-            const questions = await this.questionsRepository.find({ relations: ['questionTest']});
+            let questionsQuery = this.questionsRepository.createQueryBuilder('question');
 
+            // Define the relationships and select specific fields
+            questionsQuery
+                .leftJoinAndSelect('question.answers', 'answers')
+                .leftJoinAndSelect('question.difficulty', 'difficulty')
+                .leftJoinAndSelect('question.optionType', 'optionType')
+                .leftJoinAndSelect('question.questionTests', 'questionTest', 'questionTest.testId = :testId', { testId })
+                .addSelect(['question.id', 'question.question', 'question.optionTypeId']) // Adjust the fields you want to select
+                .addSelect(['answers.id', 'answers.content', 'answers.isCorrect'])
+                .addSelect(['difficulty.id', 'difficulty.title'])
+                .addSelect(['optionType.id', 'optionType.title']);
+        
+            // Execute the query
+            const questions = await questionsQuery.getMany();
+        
+            // Map the results to include is_added flag
             const updatedQuestions = questions.map((question) => {
-                if (question.questionTest && question.questionTest.testId === test.id) {
-                    return { ...question, is_added: true };
-                } else {
-                    return { ...question, is_added: false };
-                }
+                const isAdded = question.questionTests.length > 0; 
+                
+                // console.log(question.questionTests[0])// Adjust logic as needed
+                const question_test_id = question.questionTests[0]?.id; // Adjust logic as needed
+                const question_test_mark = question.questionTests[0]?.mark; // Adjust logic as needed
+                return { ...question, is_added: isAdded, question_test_id: question_test_id, question_test_mark: question_test_mark };
             });
 
-            console.log(questions, 'questions');
+
+            // console.log(updatedQuestions, 'sdsd')
+            // const questions = await this.questionsRepository.find({ relations: ['questionTests', 'answers', 'difficulty', 'optionType']});
+
+            // console.log(questions);
+            // const updatedQuestions = questions.map((question) => {
+            //     const isAdded = question.questionTests.some(qt => qt.testId === test.id); // Adjust this line based on your relationship setup
+            //     return { ...question, is_added: isAdded };
+            // });
+            // const updatedQuestions = questions.map((question) => {
+            //     if (question.questionTest && question.questionTest.testId === test.id) {
+            //         return { ...question, is_added: true };
+            //     } else {
+            //         return { ...question, is_added: false };
+            //     }
+            // });
+
+            // console.log(questions, 'questions');
             // return;
             return {
                 success: true,
@@ -133,17 +170,39 @@ export class TestsService {
               }
             }
 
-            const question = await this.questionsRepository.findOne({ where : { id: questionId }, relations: ['questionTest'] });
+            // console.log(questionId, 'wd')
+            const question = await this.questionsRepository.findOne({ where : { id: questionId }, relations: ['questionTests'] });
         
+            if(!question){
+                return {
+                    error: 'error',
+                    message: 'Question not found'
+                  }
+            }
             const existingEntry = await this.questionsTestRepository.findOne({ where : { questionId: questionId, testId: testId} })
 
             const is_question_test_added = is_added.is_added;
-            // console.log( is_added.is_added === 0, is_added.is_added, question, existingEntry )
+            console.log( is_added.is_added === 0, is_added.is_added, question, existingEntry )
             // return;
-            if( is_question_test_added === 0 ){
+            if( is_question_test_added === 1 ){
                 if(!existingEntry){
                     const savedQuestionTest = await this.createQuestionTest(test, question, question); 
-                    console.log(savedQuestionTest);
+                    console.log(savedQuestionTest, 'hereeeeeee');
+                    console.log(existingEntry)
+
+
+                    if(savedQuestionTest){
+                        const updatedTestMark = test.totalMarks + Number(savedQuestionTest.mark);
+                        const totalQuestions = test.totalQuestions + 1;
+                        await this.testsRepository.update({ id : test.id }, { totalQuestions: totalQuestions, totalMarks :updatedTestMark});
+            
+                    } else{
+                        return{
+                            error: 'error',
+                            message: 'An error occurred!'
+                        }
+                    }
+                    
                 } 
                 else{
                     const saveNewQuestion = await this.questionsTestRepository.update(
@@ -161,14 +220,32 @@ export class TestsService {
                             message: 'An error has occurred'
                         }
                     }
+
+                    const savedUpdatedQuestion = await this.questionsTestRepository.findOne({ where : { questionId: questionId, testId: testId} })
+                    const updatedTestMark = test.totalMarks + Number(savedUpdatedQuestion.mark);
+                    const totalQuestions = test.totalQuestions + 1;
+                    await this.testsRepository.update({ id : test.id }, { totalQuestions: totalQuestions, totalMarks :updatedTestMark});
+            
                 }
-            }
 
-            if(is_question_test_added === 1 && existingEntry){
+                }
+
+            if(is_question_test_added === 0 && existingEntry){
+                let updatedTestMark 
+                if(test.totalQuestions > 0){
+                    updatedTestMark = test.totalMarks - Number(existingEntry.mark);
+                }
+                let totalQuestions = test.totalQuestions;
+                if(test.totalQuestions > 0){
+                    totalQuestions = test.totalQuestions -= 1;
+                }
+
+                await this.testsRepository.update({ id : test.id }, { totalQuestions: totalQuestions, totalMarks :updatedTestMark});
                 await this.questionsTestRepository.delete(existingEntry.id);
+
             }
 
-            console.log(question, question.questionTest, test.id)
+            // console.log(question, question.questionTest, test.id)
             const existingEntry2 = await this.questionsTestRepository.findOne({ where : { questionId: questionId, testId: testId} })
 
             const questionData ={
@@ -195,6 +272,7 @@ export class TestsService {
     }
 
     async createQuestionTest(test, question, questionTestData){
+        // console.log(test, question, questionTestData)
         const newQuestionTest = this.questionsTestRepository.create({
             questionId: question.id,
             testId: test.id,
@@ -206,11 +284,11 @@ export class TestsService {
             updatedAt: new Date(),
         });
 
-        console.log(newQuestionTest, 'newQuestionTest')
+        // console.log(newQuestionTest, 'newQuestionTest')
 
         const saveNewQuestionTest = await this.questionsTestRepository.save(newQuestionTest);
         if(saveNewQuestionTest)
-            return true;
+            return saveNewQuestionTest;
         else 
             return false;
     }
@@ -242,6 +320,53 @@ export class TestsService {
                 success: 'success',
                 message: 'Test updated successfully',
                 data: updatedTest,
+            };
+            return data;
+
+        } catch (err){
+            let data = {
+                error: err.message,
+            };
+            return data;
+        }
+    }
+
+    async addTestQuestionMark(testId: number, questionId: number, set_mark: any): Promise<any> {
+        try{
+            const test = await this.testsRepository.findOne({ where : { id: testId} });
+        
+            if(!test) {
+              return {
+                error: 'error',
+                message: 'Test not found'
+              }
+            }
+
+            // console.log(questionId, 'wd')
+            // const question = await this.questionsRepository.findOne({ where : { id: questionId }, relations: ['questionTests'] });
+        
+            // if(!question){
+            //     return {
+            //         error: 'error',
+            //         message: 'Question not found'
+            //       }
+            // }
+            const mark = set_mark.mark;
+
+            console.log(mark, 'sdsdd')
+            const existingEntry = await this.questionsTestRepository.findOne({ where : { id: questionId, testId: testId} })
+    
+           const updated =  await this.questionsTestRepository.update({ id :existingEntry.id }, {mark: Number(mark)});
+
+           const updatedTestMark = test.totalMarks + Number(mark);
+        //    const totalQuestions = test.totalQuestions += Number(mark);
+            await this.testsRepository.update({ id :test.id }, { totalMarks: updatedTestMark});
+
+           
+           console.log(updated, 'updated')
+            let data = {
+                success: 'success',
+                message: 'Question Test updated successfully',
             };
             return data;
 

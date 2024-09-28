@@ -31,6 +31,15 @@ export class TestsController {
       return this.testsService.addQuestionTest(testId, questionId, is_added);
     }
 
+    @Post('/:testId/:questionId/mark')
+    addTestQuestionMark(
+      @Param('testId', ParseIntPipe) testId: number,
+      @Param('questionId', ParseIntPipe) questionId: number,
+      @Body() mark: any,
+    ) {
+      return this.testsService.addTestQuestionMark(testId, questionId, mark);
+    }
+
     @Get('/question-assign-index/:testId')
     getQuestionTestsAssign(
       @Param('testId', ParseIntPipe) testId: number,
