@@ -27,11 +27,8 @@ export class TestsService {
 
     async getAllTests() {
       const all_tests = await this.testsRepository.find({relations: ['user']});
-  
-    //   const updatedQuestions = all_tests.map((question) => {
-    //         question.formatted_start_date = 
-    //     });
 
+    // await this.resetAllTests();
       const res = {
           success: 'success',
           message: 'successful',
@@ -40,6 +37,49 @@ export class TestsService {
 
       return res;
     }
+
+    async resetAllTests() {
+        try {
+            const all_tests = await this.testsRepository.find({ relations: ['user'] });
+    
+            for (const test of all_tests) {
+                const questionTests = await this.questionsTestRepository.find({ where: { testId: test.id } });
+    
+                let totalMarks = 0;
+                let totalQuestions = 0;
+    
+                for (const questionTest of questionTests) {
+                    totalMarks += questionTest.mark || 0;
+                    totalQuestions++;
+                }
+    
+                const testUpdated = await this.testsRepository.update(
+                    { id: test.id },
+                    { totalQuestions, totalMarks }
+                );
+    
+                if (testUpdated.affected < 1) {
+                    return {
+                        error: 'error',
+                        message: 'An error has occurred while updating the test totals',
+                    };
+                }
+            }
+    
+            return {
+                success: 'success',
+                message: 'Successfully retrieved and updated tests',
+                data: all_tests,
+            };
+        } catch (error) {
+            return {
+                error: 'error',
+                message: 'An unexpected error occurred',
+                details: error.message,
+            };
+        }
+    }
+    
 
     async getTestById(id: number): Promise<any | undefined> {
       try {
@@ -73,7 +113,7 @@ export class TestsService {
               updatedAt: new Date(),
           });
 
-          console.log(newTest, 'newTest')
+        //   console.log(newTest, 'newTest')
           await this.testsRepository.save(newTest);
           let data = {
               success: 'success',
@@ -150,7 +190,7 @@ export class TestsService {
             };
             
           } catch (err) {
-            console.log(err)
+            // console.log(err)
             return {
               error: 'error',
               message: 'An error occurred while sending project invites'
@@ -182,87 +222,108 @@ export class TestsService {
             const existingEntry = await this.questionsTestRepository.findOne({ where : { questionId: questionId, testId: testId} })
 
             const is_question_test_added = is_added.is_added;
-            console.log( is_added.is_added === 0, is_added.is_added, question, existingEntry )
+            // console.log( is_added.is_added === 0, is_added.is_added, question, existingEntry )
             // return;
             if( is_question_test_added === 1 ){
                 if(!existingEntry){
                     const savedQuestionTest = await this.createQuestionTest(test, question, question); 
-                    console.log(savedQuestionTest, 'hereeeeeee');
-                    console.log(existingEntry)
+                    // console.log(savedQuestionTest, 'hereeeeeee');
+                    // console.log(existingEntry)
 
 
-                    if(savedQuestionTest){
-                        const updatedTestMark = test.totalMarks + Number(savedQuestionTest.mark);
-                        const totalQuestions = test.totalQuestions + 1;
-                        await this.testsRepository.update({ id : test.id }, { totalQuestions: totalQuestions, totalMarks :updatedTestMark});
+                    // if(savedQuestionTest){
+                    //     const updatedTestMark = test.totalMarks + Number(savedQuestionTest.mark);
+                    //     const totalQuestions = test.totalQuestions + 1;
+                    //     await this.testsRepository.update({ id : test.id }, { totalQuestions: totalQuestions, totalMarks :updatedTestMark});
             
-                    } else{
-                        return{
-                            error: 'error',
-                            message: 'An error occurred!'
-                        }
-                    }
+                    // } else{
+                    //     return{
+                    //         error: 'error',
+                    //         message: 'An error occurred!'
+                    //     }
+                    // }
                     
                 } 
-                else{
-                    const saveNewQuestion = await this.questionsTestRepository.update(
-                        { id: existingEntry.id },
-                        {   
-                            question: question.question,
-                            optionAnswerTypeId: question.optionTypeId,
-                            mark: question.marks??Number(0),
-                            instruction: question.instruction??null,
-                        },
-                    ); 
-                    if(saveNewQuestion.affected < 1){
-                        return {
-                            error:'error',
-                            message: 'An error has occurred'
+                    else{
+                        const saveNewQuestion = await this.questionsTestRepository.update(
+                            { id: existingEntry.id },
+                            {   
+                                question: question.question,
+                                optionAnswerTypeId: question.optionTypeId,
+                                mark: question.marks??Number(0),
+                                instruction: question.instruction??null,
+                            },
+                        ); 
+                        if(saveNewQuestion.affected < 1){
+                            return {
+                                error:'error',
+                                message: 'An error has occurred'
+                            }
                         }
+
+                        // const savedUpdatedQuestion = await this.questionsTestRepository.findOne({ where : { questionId: questionId, testId: testId} })
+                        // const updatedTestMark = test.totalMarks + Number(savedUpdatedQuestion.mark);
+                        // const totalQuestions = test.totalQuestions + 1;
+                        // await this.testsRepository.update({ id : test.id }, { totalQuestions: totalQuestions, totalMarks :updatedTestMark});
+                
                     }
 
-                    const savedUpdatedQuestion = await this.questionsTestRepository.findOne({ where : { questionId: questionId, testId: testId} })
-                    const updatedTestMark = test.totalMarks + Number(savedUpdatedQuestion.mark);
-                    const totalQuestions = test.totalQuestions + 1;
-                    await this.testsRepository.update({ id : test.id }, { totalQuestions: totalQuestions, totalMarks :updatedTestMark});
-            
-                }
+                    
+
 
                 }
 
             if(is_question_test_added === 0 && existingEntry){
-                let updatedTestMark 
-                if(test.totalQuestions > 0){
-                    updatedTestMark = test.totalMarks - Number(existingEntry.mark);
-                }
-                let totalQuestions = test.totalQuestions;
-                if(test.totalQuestions > 0){
-                    totalQuestions = test.totalQuestions -= 1;
-                }
+                // let updatedTestMark 
+                // if(test.totalQuestions > 0){
+                //     updatedTestMark = test.totalMarks - Number(existingEntry.mark);
+                // }    
+                // let totalQuestions = test.totalQuestions;
+                // if(test.totalQuestions > 0){
+                //     totalQuestions = test.totalQuestions -= 1;
+                // }
 
-                await this.testsRepository.update({ id : test.id }, { totalQuestions: totalQuestions, totalMarks :updatedTestMark});
+                // await this.testsRepository.update({ id : test.id }, { totalQuestions: totalQuestions, totalMarks :updatedTestMark});
                 await this.questionsTestRepository.delete(existingEntry.id);
 
             }
+
+            const questionTests = await this.questionsTestRepository.find({ where : { testId: test.id} })
+
+            let totalmark = 0;
+            let totalQuestions = 0;
+
+            for(const test of questionTests){
+                totalmark += test.mark;
+                totalQuestions++;
+            }
+            const testUpdated = await this.testsRepository.update({ id : test.id }, { totalQuestions: totalQuestions, totalMarks :totalmark});
+            if(testUpdated.affected < 1){
+                return {
+                    error:'error',
+                    message: 'An error has occurred'
+                }
+            }
+
 
             // console.log(question, question.questionTest, test.id)
             const existingEntry2 = await this.questionsTestRepository.findOne({ where : { questionId: questionId, testId: testId} })
 
             const questionData ={
-                ...question,
-                is_added: existingEntry2 ? true : false
+                // ...question,
+                
             }
 
             return {
                 success: 'success',
-                question: questionData,
+                is_added: existingEntry2 ? true : false,
                 message: 'Question Test updated successfully'
             }
             
             
             
         } catch (err) {
-            console.log(err)
+            // console.log(err)
             return {
                 error: 'error',
                 message: 'An error occurred while sending project invites'
@@ -345,25 +406,42 @@ export class TestsService {
             // console.log(questionId, 'wd')
             // const question = await this.questionsRepository.findOne({ where : { id: questionId }, relations: ['questionTests'] });
         
-            // if(!question){
+            
+            const mark = set_mark.mark;
+
+            const existingEntry = await this.questionsTestRepository.findOne({ where : { questionId: questionId, testId: testId} })
+            // if(!existingEntry){
             //     return {
             //         error: 'error',
             //         message: 'Question not found'
             //       }
             // }
-            const mark = set_mark.mark;
 
-            console.log(mark, 'sdsdd')
-            const existingEntry = await this.questionsTestRepository.findOne({ where : { id: questionId, testId: testId} })
-    
-           const updated =  await this.questionsTestRepository.update({ id :existingEntry.id }, {mark: Number(mark)});
+            console.log(existingEntry, 'existinf')
 
-           const updatedTestMark = test.totalMarks + Number(mark);
+            const updated =  await this.questionsTestRepository.update({ id : existingEntry.id }, {mark: Number(mark)});
+            console.log(updated, 'updated')
+            if(updated.affected < 1){
+                return {
+                    error: 'error',
+                    message: 'An error occurred'
+                  }
+            }
+
+            const questionTests = await this.questionsTestRepository.find({ where : { testId: testId} })
+
+            let totalmark = 0;
+
+            for(const test of questionTests){
+                totalmark += test.mark;
+            }
+
+        //    const updatedTestMark = test.totalMarks + Number(mark);
         //    const totalQuestions = test.totalQuestions += Number(mark);
-            await this.testsRepository.update({ id :test.id }, { totalMarks: updatedTestMark});
+            await this.testsRepository.update({ id :test.id }, { totalMarks: totalmark});
 
            
-           console.log(updated, 'updated')
+        //    console.log(updated, 'updated')
             let data = {
                 success: 'success',
                 message: 'Question Test updated successfully',
@@ -371,6 +449,7 @@ export class TestsService {
             return data;
 
         } catch (err){
+            console.log(err)
             let data = {
                 error: err.message,
             };
