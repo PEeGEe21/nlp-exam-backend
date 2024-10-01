@@ -1,6 +1,7 @@
 export class LoginResponseDto {
-  access_token: string;
-  success: string;
+  access_token?: string;
+  success?: string;
   message: string;
-  user: any;
+  user?: any;
+  error?: any;
 }

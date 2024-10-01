@@ -54,9 +54,13 @@ export class AuthService {
             const isCorrectPassword = await bcrypt.compare(password, userPassword);
 
             if (!isCorrectPassword) {
-                throw new BadRequestException(
-                    'SignIn Failed!, Incorrect login credentials',
-                );
+              return {
+                  error: 'Error',
+                  message: 'Incorrect Password'
+              }
+                // throw new BadRequestException(
+                //     'SignIn Failed!, Incorrect login credentials',
+                // );
             }
             
             const payload = {
@@ -76,6 +80,7 @@ export class AuthService {
             return response;
 
         } catch (error) {
+          // console.log(error)
             throw new Error('Error Occured while signing');
         }
         
@@ -122,7 +127,7 @@ export class AuthService {
         user.profile = userProfileDetails
         const profile = userProfileDetails
     
-        console.log(profile, student, 'profile details')
+        // console.log(profile, student, 'profile details')
         // if (config.env === 'production') {
         //   const data = {
         //     env: 'Production',
