@@ -9,7 +9,7 @@ import { Question } from 'src/typeorm/entities/Question';
 import { Test } from 'src/typeorm/entities/Test';
 import { QuestionTest } from 'src/typeorm/entities/QuestionTest';
 import { UsersService } from 'src/users/services/users.service';
-import { Repository } from 'typeorm';
+import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 
 @Injectable()
 export class TestsService {

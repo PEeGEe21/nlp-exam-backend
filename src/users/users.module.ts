@@ -5,9 +5,17 @@ import { UsersController } from './controllers/users.controller';
 import { User } from 'src/typeorm/entities/User';
 import { Profile } from 'src/typeorm/entities/Profile';
 import { DifficultyType } from 'src/typeorm/entities/DifficultyType';
+import { Question } from 'src/typeorm/entities/Question';
+import { Student } from 'src/typeorm/entities/Student';
+import { Result } from 'src/typeorm/entities/Result';
+import { TestsModule } from 'src/tests/tests.module';
+import { Test } from 'src/typeorm/entities/Test';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Profile, DifficultyType])],
+  imports: [
+    // TestsModule,
+    TypeOrmModule.forFeature([User, Profile, DifficultyType, Question, Test, Student, Result])
+  ],
   providers: [UsersService],
   controllers: [UsersController],
   exports: [UsersService],
