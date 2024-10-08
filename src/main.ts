@@ -33,6 +33,8 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
 
   const seederService = app.get(SeederService);
+  // await seederService.seedResultsScores();
+  // await seederService.seedResults();
   // await seederService.seedDifficulties();
   // await seederService.seedOptionTypes();
   // await seederService.seedQuestions();

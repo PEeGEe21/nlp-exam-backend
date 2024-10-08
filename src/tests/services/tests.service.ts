@@ -83,9 +83,14 @@ export class TestsService {
 
     async getTestById(id: number): Promise<any | undefined> {
       try {
-          const test = await this.testsRepository.findOneBy({ id });
+          const test = await this.testsRepository.findOne({ where: {id: id} });
           if (!test)
-              throw new HttpException('Question not found', HttpStatus.BAD_REQUEST);
+          {
+            return {
+                error: 'error',
+                message: 'Test not found'
+            }
+          }
       
           let data = {
               test,

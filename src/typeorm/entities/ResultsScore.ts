@@ -11,9 +11,10 @@ import {
 import { QuestionTest } from './QuestionTest';
 import { Test } from './Test';
 import { Result } from './Result';
+import { Question } from './Question';
 
 @Entity('result_scores')
-@Index('index_result_score', ['resultId', 'questionId', 'questionTestId'])
+@Index('index_result_score', ['result', 'questionId', 'questionTest'])
 export class ResultsScore {
   @PrimaryGeneratedColumn()
   id: number;
@@ -39,8 +40,8 @@ export class ResultsScore {
   @Column({ type: 'longtext', nullable: true })
   comments: string;
 
-  @Column({ type: 'int', nullable: true })
-  questionTestId: number;
+  // @Column({ type: 'int', nullable: true })
+  // questionTestId: number;
 
   @Column({ type: 'decimal', precision: 30, scale: 2, nullable: true })
   time: number;
@@ -71,7 +72,10 @@ export class ResultsScore {
 
   @ManyToOne(() => QuestionTest)
   @JoinColumn({ name: 'question_test_id' })
-  question: QuestionTest;
+  questionTest: QuestionTest;
+
+  @ManyToOne(() => Question)
+  question: Question;
 
   // Static method for ScopeByFilter-like functionality
   static byFilter(query: any, data: Record<string, any>) {

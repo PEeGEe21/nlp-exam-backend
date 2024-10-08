@@ -48,7 +48,7 @@ import { SanitizerService } from './core/utils/SanitizerService';
     }),
     TypeOrmModule.forFeature([User, Profile, DifficultyType, Question, Result, QuestionTest, ResultsScore, Test, Student, OptionType, DifficultyType, Answer]), // Ensure Role is added here
     AuthModule, 
-    UsersModule, TestsModule, QuestionsModule, TestsModule, ResultsModule, DifficultyTypesModule, OptionTypesModule
+    UsersModule, QuestionsModule, TestsModule, ResultsModule, DifficultyTypesModule, OptionTypesModule
   ],
   controllers: [AppController],
   providers: [AppService, SeederService, SanitizerService],

@@ -18,8 +18,8 @@ export class Result {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'varchar', length: 255 })
-    studentId: string;
+    // @Column({ type: 'int' })
+    // studentId: number;
 
     @Column({ type: 'int' })
     testId: number;
@@ -49,7 +49,7 @@ export class Result {
     totalMarks: number;
 
     @Column({ type: 'simple-array', nullable: true })
-    questionTestIds: string[];  // Array type for question_test_ids
+    questionTestIds: number[];  // Array type for question_test_ids
 
     @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
     createdAt: Date;

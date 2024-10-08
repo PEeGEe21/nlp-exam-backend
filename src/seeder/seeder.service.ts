@@ -6,7 +6,12 @@ import { Answer } from 'src/typeorm/entities/Answer';
 import { DifficultyType } from 'src/typeorm/entities/DifficultyType';
 import { OptionType } from 'src/typeorm/entities/OptionType';
 import { Question } from 'src/typeorm/entities/Question';
+import { QuestionTest } from 'src/typeorm/entities/QuestionTest';
+import { Result } from 'src/typeorm/entities/Result';
+import { Student } from 'src/typeorm/entities/Student';
 import { Test } from 'src/typeorm/entities/Test';
+import { User } from 'src/typeorm/entities/User';
+import { ResultsScore } from 'src/typeorm/entities/ResultsScore';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 
@@ -24,6 +29,11 @@ export class SeederService {
     @InjectRepository(Question) private readonly questionRepository: Repository<Question>,
     @InjectRepository(Answer) private readonly answerRepository: Repository<Answer>,
     @InjectRepository(Test) private readonly testRepository: Repository<Test>,
+    @InjectRepository(Student) private readonly studentRepository: Repository<Student>,
+    @InjectRepository(Result) private readonly resultRepository: Repository<Result>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(QuestionTest) private readonly questionTestRepository: Repository<QuestionTest>,
+    @InjectRepository(ResultsScore) private readonly resultsScoreRepository: Repository<ResultsScore>,
 
 
   ) {}
@@ -247,6 +257,127 @@ export class SeederService {
     }
 
     console.log('Test seeding completed');
+  }
+
+  async seedResults() {
+    const results = [
+      {
+        studentId: 1,
+        testId: 1,
+        startDate: new Date('2024-09-20T09:00:00Z'),
+        endDate: new Date('2024-09-20T12:00:00Z'),
+        serverEndDate: new Date('2024-09-20T12:05:00Z'),
+        duration: 180, // 3 hours in minutes
+        totalScored: 45,
+        manualLock: 0,
+        totalCount: 50,
+        totalMarks: 50,
+        // questionTestIds: ['QT101', 'QT102', 'QT103'],
+        userId: 3, // Link to the user (instructor/teacher)
+      },
+      {
+        studentId: 1,
+        testId: 2,
+        startDate: new Date('2024-10-05T14:00:00Z'),
+        endDate: new Date('2024-10-05T15:00:00Z'),
+        serverEndDate: new Date('2024-10-05T15:05:00Z'),
+        duration: 60, // 1 hour in minutes
+        totalScored: 60,
+        manualLock: 0,
+        totalCount: 70,
+        totalMarks: 70,
+        // questionTestIds: [1, 2, 'QT203'],
+        userId: 3, // Link to the user (instructor/teacher)
+      },
+      // Add more results as needed
+    ];
+
+    for (const resultData of results) {
+      const studentCheck = await this.studentRepository.findOne({ where: { id: resultData.studentId } });
+        console.log(studentCheck)
+      const testCheck = await this.testRepository.findOne({ where: { id: resultData.testId } });
+        
+
+      const existingResult = await this.resultRepository.findOne({
+        where: { student: studentCheck, test: testCheck },
+      });
+
+      console.log(!existingResult && studentCheck && testCheck)
+      if (!existingResult && studentCheck && testCheck) {
+        
+        const user = await this.userRepository.findOne({ where: { id: resultData.userId } });
+
+        const questions = await this.questionTestRepository.find({ where: { testId: testCheck.id } });
+
+        const questionTestIds = questions.map((question) => question.id);
+
+        if (user && testCheck) {
+          const newResult = this.resultRepository.create({
+            student: studentCheck,
+            testId: testCheck.id,
+            startDate: resultData.startDate,
+            endDate: resultData.endDate,
+            serverEndDate: resultData.serverEndDate,
+            duration: resultData.duration,
+            totalScored: resultData.totalScored,
+            manualLock: resultData.manualLock,
+            totalCount: resultData.totalCount,
+            totalMarks: resultData.totalMarks,
+            questionTestIds: questionTestIds,
+            user,
+            test: testCheck,
+          });
+
+          await this.resultRepository.save(newResult);
+          console.log(`Result for student ${resultData.studentId} in test ${testCheck.title} has been seeded`);
+        }
+      } else {
+        console.log(`Result for student ${resultData.studentId} in test ${resultData.testId} already exists`);
+      }
+    }
+
+    console.log('Result seeding completed');
+  }
+
+  async seedResultsScores() {
+    const results = await this.resultRepository.find({relations: ['test']});
+    
+    for (const result of results) {
+      // const testCheck = await this.testRepository.findOne({ where: {id: result.test.id}});
+      // console.log(testCheck, result.test, 'ssdsd')
+      const questions = await this.questionTestRepository.find({ where: { testId: result.test.id } });
+
+      // console.log( result.test, questions, 'questions')
+
+      for (const question of questions) {
+        // console.log(question, 'question')
+        const existingScore = await this.resultsScoreRepository.findOne({
+          where: { resultId: result.id, questionTest: question },
+        });
+
+        // console.log(existingScore, result.test, 'sdsd');
+
+        if (!existingScore && result.test) {
+          const newScore = this.resultsScoreRepository.create({
+            resultId: result.id,
+            result: result,
+            test: result.test,
+            questionId: question.questionId,
+            score: '0',
+            scored: false,
+            state: 0,
+            questionTest: question,
+            time: 0,
+            isCorrect: false,
+          });
+
+          await this.resultsScoreRepository.save(newScore);
+          console.log(`ResultsScore for result ${result.id} and question ${question.id} has been seeded`);
+        }
+      }
+    }
+
+    // console.log('ResultsScore seeding completed');
   }
 
 }
