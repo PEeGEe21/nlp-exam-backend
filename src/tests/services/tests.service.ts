@@ -9,7 +9,7 @@ import { Question } from 'src/typeorm/entities/Question';
 import { Test } from 'src/typeorm/entities/Test';
 import { QuestionTest } from 'src/typeorm/entities/QuestionTest';
 import { UsersService } from 'src/users/services/users.service';
-import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { LessThanOrEqual, MoreThanOrEqual, Repository, MoreThan } from 'typeorm';
 
 @Injectable()
 export class TestsService {
@@ -27,6 +27,25 @@ export class TestsService {
 
     async getAllTests() {
       const all_tests = await this.testsRepository.find({relations: ['user']});
+
+    // await this.resetAllTests();
+      const res = {
+          success: 'success',
+          message: 'successful',
+          data: all_tests,
+      };
+
+      return res;
+    }
+
+    async getAllStudentTests() {
+      const all_tests = await this.testsRepository.find({
+        where: {totalQuestions: MoreThan(0)}, 
+        order: {
+            createdAt: 'DESC', // Sort by creation date in descending order
+        },
+        relations: ['user']
+    });
 
     // await this.resetAllTests();
       const res = {
@@ -192,6 +211,40 @@ export class TestsService {
             return {
                 success: true,
                 data: updatedQuestions,
+            };
+            
+          } catch (err) {
+            // console.log(err)
+            return {
+              error: 'error',
+              message: 'An error occurred while sending project invites'
+            }
+        }
+
+    }
+
+    async getTestQuestions(testId: number): Promise<any> {
+        try{
+            const test = await this.testsRepository.findOne({ where : { id: testId} });
+        
+            if(!test) {
+              return {
+                error: 'error',
+                message: 'Test not found'
+              }
+            }
+        
+            const questionTest = await this.questionsTestRepository.find({
+                where: {
+                    testId: test.id
+                },
+                relations: ['questionRelation', 'questionRelation.answers']
+            });
+
+            console.log(questionTest);
+            return {
+                success: true,
+                data: questionTest,
             };
             
           } catch (err) {

@@ -46,6 +46,7 @@ export class UsersService {
                 createdAt: 'DESC', // Sort by creation date in descending order
             },
             take: 8, // Limit the number of results to 8
+            relations: ['user', 'test', 'student', 'student.user'],
         });
     
         const total_questions = all_questions.length;

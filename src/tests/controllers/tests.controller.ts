@@ -12,9 +12,19 @@ export class TestsController {
         return this.testsService.getAllTests();
     }
 
+    @Get('/student')
+    getAllStudentTests() {
+        return this.testsService.getAllStudentTests();
+    }
+
     @Get('/:id')
     getTest(@Param('id', ParseIntPipe) id: number) {
-    return this.testsService.getTestById(id);
+      return this.testsService.getTestById(id);
+    }
+
+    @Get('/:id/questions')
+    getTestQuestions(@Param('id', ParseIntPipe) id: number) {
+      return this.testsService.getTestQuestions(id);
     }
 
     @Post('/create')
