@@ -10,6 +10,8 @@ import { Test } from 'src/typeorm/entities/Test';
 import { QuestionTest } from 'src/typeorm/entities/QuestionTest';
 import { UsersService } from 'src/users/services/users.service';
 import { LessThanOrEqual, MoreThanOrEqual, Repository, MoreThan } from 'typeorm';
+import { SaveStudentTestDto } from '../dtos/save-student-test.dto';
+import { Student } from 'src/typeorm/entities/Student';
 
 @Injectable()
 export class TestsService {
@@ -19,6 +21,7 @@ export class TestsService {
         private difficultyService: DifficultyTypesService,
         private optionService: OptionTypesService,
 
+        @InjectRepository(Student) private studentsRepository: Repository<Student>,
         @InjectRepository(Question) private questionsRepository: Repository<Question>,
         @InjectRepository(QuestionTest) private questionsTestRepository: Repository<QuestionTest>,
         @InjectRepository(Test) private testsRepository: Repository<Test>
@@ -139,6 +142,56 @@ export class TestsService {
 
         //   console.log(newTest, 'newTest')
           await this.testsRepository.save(newTest);
+          let data = {
+              success: 'success',
+          };
+          return data;
+
+      } catch (err) {
+          let data = {
+              error: err.message,
+          };
+          return data;
+      }
+    };
+
+    async saveStudentTest(test_id: number, studentTestData: SaveStudentTestDto): Promise<any> {
+        console.log(studentTestData)
+      const user = await this.usersService.getUserAccountById(studentTestData.user_id);
+      if(!user){
+        return {
+            error: 'error',
+            message: 'User Not Found'
+        }
+      }
+
+      const student = await this.studentsRepository.findOne({where: {user: user}})
+      if(!student){
+        return {
+            error: 'error',
+            message: 'Student Not Found'
+        }
+      }
+
+      console.log(user, student)
+  
+      try{
+        //   const newTest = this.testsRepository.create({
+        //       user: user,
+        //       markPerQuestion: testData.markPerQuestion,
+        //       title: testData.title,
+        //       code: testData.code,
+        //       durationHours: testData.durationHours,
+        //       durationMinutes: testData.durationMinutes,
+        //       instructions: testData.instructions,
+        //       startDate: testData.startDate,
+        //       endDate: testData.endDate,
+        //       createdAt: new Date(),
+        //       updatedAt: new Date(),
+        //   });
+
+        // //   console.log(newTest, 'newTest')
+        //   await this.testsRepository.save(newTest);
           let data = {
               success: 'success',
           };

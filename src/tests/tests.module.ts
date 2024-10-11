@@ -14,6 +14,7 @@ import { Answer } from 'src/typeorm/entities/Answer';
 import { OptionType } from 'src/typeorm/entities/OptionType';
 import { QuestionTest } from 'src/typeorm/entities/QuestionTest';
 import { Test } from 'src/typeorm/entities/Test';
+import { Student } from 'src/typeorm/entities/Student';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { Test } from 'src/typeorm/entities/Test';
     QuestionsModule,
     DifficultyTypesModule,
     OptionTypesModule,
-    TypeOrmModule.forFeature([User, Profile, DifficultyType, Question, Answer, OptionType, QuestionTest, Test])
+    TypeOrmModule.forFeature([User, Profile, DifficultyType, Question, Answer, OptionType, QuestionTest, Test, Student])
   ],
   controllers: [TestsController],
   providers: [TestsService],

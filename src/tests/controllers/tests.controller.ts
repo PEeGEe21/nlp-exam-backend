@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put } 
 import { TestsService } from '../../tests/services/tests.service';
 import { Test } from 'src/typeorm/entities/Test';
 import { QuestionTest } from 'src/typeorm/entities/QuestionTest';
+import { SaveStudentTestDto } from '../dtos/save-student-test.dto';
 
 @Controller('tests')
 export class TestsController {
@@ -30,6 +31,14 @@ export class TestsController {
     @Post('/create')
     createTest(@Body() testData: Partial<Test>) {
         return this.testsService.createTest(testData);
+    }
+
+    @Post('/:id/submit')
+    async saveStudentTest(
+      @Param('id', ParseIntPipe) id: number,
+      @Body() studentTestData: SaveStudentTestDto
+    ): Promise<any> {
+        return this.testsService.saveStudentTest(id, studentTestData);
     }
 
     @Post('/add-question-to-test/:testId/:questionId')
