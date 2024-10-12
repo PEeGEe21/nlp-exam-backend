@@ -82,6 +82,33 @@ export class UsersService {
         return tests;
     }
 
+    async getUserResults(user_id: number): Promise<any | undefined> {
+        const user = await this.userRepository.findOne({where: { id: user_id }});
+        if(!user){
+            return{
+                error: 'error',
+                message: 'No User Found'
+            }
+        }
+
+        const results = await this.resultsRepository.find({
+            where:{user : user},
+            order: {
+                createdAt: 'DESC', // Sort by creation date in descending order
+            },
+            take: 8, // Limit the number of results to 8
+            relations: ['user', 'test', 'student', 'student.user'],
+        });
+
+        const res = {
+            success: 'success',
+            message: 'successful',
+            results
+        };
+
+        return res;
+    }
+
     async getUserAccountByEmail(email: string) {
         // const user = this.users.find(user => user.email === email);
         const user = await this.userRepository.findOneBy({ email });    

@@ -12,6 +12,8 @@ import { UsersService } from 'src/users/services/users.service';
 import { LessThanOrEqual, MoreThanOrEqual, Repository, MoreThan } from 'typeorm';
 import { SaveStudentTestDto } from '../dtos/save-student-test.dto';
 import { Student } from 'src/typeorm/entities/Student';
+import { Result } from 'src/typeorm/entities/Result';
+import { ResultsScore } from 'src/typeorm/entities/ResultsScore';
 
 @Injectable()
 export class TestsService {
@@ -24,7 +26,9 @@ export class TestsService {
         @InjectRepository(Student) private studentsRepository: Repository<Student>,
         @InjectRepository(Question) private questionsRepository: Repository<Question>,
         @InjectRepository(QuestionTest) private questionsTestRepository: Repository<QuestionTest>,
-        @InjectRepository(Test) private testsRepository: Repository<Test>
+        @InjectRepository(Test) private testsRepository: Repository<Test>,
+        @InjectRepository(Result) private resultRepository: Repository<Result>,
+        @InjectRepository(ResultsScore) private resultsScoreRepository: Repository<ResultsScore>,
 
     ) {}
 
@@ -157,6 +161,7 @@ export class TestsService {
 
     async saveStudentTest(test_id: number, studentTestData: SaveStudentTestDto): Promise<any> {
         console.log(studentTestData)
+
       const user = await this.usersService.getUserAccountById(studentTestData.user_id);
       if(!user){
         return {
@@ -173,29 +178,170 @@ export class TestsService {
         }
       }
 
-      console.log(user, student)
+      const test = await this.testsRepository.findOne({where: {id: test_id}});
+      if(!test){
+        return {
+            error: 'error',
+            message: 'Test Not Found'
+        }
+      }
   
       try{
-        //   const newTest = this.testsRepository.create({
-        //       user: user,
-        //       markPerQuestion: testData.markPerQuestion,
-        //       title: testData.title,
-        //       code: testData.code,
-        //       durationHours: testData.durationHours,
-        //       durationMinutes: testData.durationMinutes,
-        //       instructions: testData.instructions,
-        //       startDate: testData.startDate,
-        //       endDate: testData.endDate,
-        //       createdAt: new Date(),
-        //       updatedAt: new Date(),
-        //   });
 
-        // //   console.log(newTest, 'newTest')
-        //   await this.testsRepository.save(newTest);
-          let data = {
-              success: 'success',
-          };
-          return data;
+        const answers = JSON.parse(studentTestData.answers);
+
+        const selectedOptions = answers.selectedOptions;
+
+        let totalCount = 0;
+        let totalMarks = 0;
+        let totalScored = 0;
+        let questionTestIds = [];
+
+        for (const [questionTestId, selectedOptionId] of Object.entries(selectedOptions)) {
+            const questionTest = await this.questionsTestRepository.findOne({
+              where: {
+                id: Number(questionTestId),
+                testId: test.id,
+              },
+              relations: ['questionRelation', 'questionRelation.answers'],
+            });
+          
+            if (questionTest) {
+                let question = questionTest.questionRelation;
+                let selectedAnswer;
+                let isCorrect = false;
+                let correctAnswer = '';
+
+                for (const answer of question.answers){
+                    if(answer.id === Number(selectedOptionId)){
+                        selectedAnswer = answer;
+                        if(selectedAnswer.isCorrect === 1){
+                            isCorrect = true;
+                            totalScored += questionTest.mark
+                        }
+                    }
+                    if (answer.isCorrect) {
+                        correctAnswer = answer.content;
+                    }
+                }
+              
+                // console.log(question);   
+                console.log(`Question ID: ${question}, Selected Option ID: ${selectedOptionId}`);
+                totalMarks += questionTest.mark
+                questionTestIds.push(questionTest.id);
+
+                const newScore = this.resultsScoreRepository.create({
+                    resultId: 0, // Will be updated with actual result later
+                    questionId: question.id,
+                    questionTest,
+                    test,
+                    score: isCorrect ? questionTest.mark.toString() : '0',
+                    scored: true,
+                    studentAnswer: selectedAnswer ? selectedAnswer.content : '',
+                    isCorrect,
+                    correctAnswer,
+                    result: null,
+                });
+                await this.resultsScoreRepository.save(newScore);
+
+            } else {
+              console.log(`Question with ID ${questionTestId} not found.`);
+            }
+
+            totalCount++;
+        }
+        console.log(selectedOptions, answers)
+        console.log(test_id, 
+            studentTestData.startExamDateTime, 
+            studentTestData.endExamDateTime, 
+            studentTestData.duration, 
+            totalCount, 
+            totalMarks, 
+            totalScored, 
+            questionTestIds)
+
+        const payload = {
+            student,
+            testId: test_id, 
+            startExamDateTime: studentTestData.startExamDateTime, 
+            endExamDateTime: studentTestData.endExamDateTime, 
+            duration: studentTestData.duration, 
+            totalCount, 
+            totalMarks, 
+            totalScored, 
+            questionTestIds,
+            user,
+            test
+        }
+
+        const savedResult = await this.saveStudentResult(payload);
+
+        const resultScores = await this.resultsScoreRepository.find({where: { resultId : 0 }})
+        for(const score of resultScores){
+            score.resultId = savedResult.id;
+            score.result = savedResult;
+            await this.resultsScoreRepository.save(score);
+        }
+
+
+
+        // for (const [questionTestId, selectedOptionId] of Object.entries(selectedOptions)) {
+        //     // Use await for your repository call
+        //     const questionTest = await this.questionsTestRepository.findOne({
+        //       where: {
+        //         id: Number(questionTestId),
+        //         testId: test.id,
+        //       },
+        //       relations: ['questionRelation', 'questionRelation.answers'],
+        //     });
+          
+        //     if (questionTest) {
+        //         let question = questionTest.questionRelation;
+        //         let selectedAnswer;
+        //         let isCorrect = false;
+        //         let correctAnswer = '';
+
+
+        //         //   let correctAnswer = question.answers.find((i) => i.isCorrect === i.isCorrect);
+        //         for (const answer of question.answers){
+        //             if(answer.id === Number(selectedOptionId)){
+        //                 selectedAnswer = answer;
+        //                 if(selectedAnswer.isCorrect === 1){
+        //                     isCorrect = true;
+        //                     totalScored += questionTest.mark
+        //                 }
+        //             }
+
+        //             if (answer.isCorrect) {
+        //                 correctAnswer = answer.content;
+        //             }
+        //         }
+
+        //         // const newScore = this.resultsScoreRepository.create({
+        //         //     resultId: savedResult.id, // Will be updated with actual result later
+        //         //     questionId: question.id,
+        //         //     questionTest,
+        //         //     test,
+        //         //     score: isCorrect ? questionTest.mark.toString() : '0',
+        //         //     scored: true,
+        //         //     studentAnswer: selectedAnswer ? selectedAnswer.content : '',
+        //         //     isCorrect,
+        //         //     correctAnswer,
+        //         // });
+
+        //         // await this.resultsScoreRepository.save(newScore);
+
+        //     } else {
+        //       console.log(`Question with ID ${questionTestId} not found.`);
+        //     }
+
+        // }
+
+        
+        let data = {
+            success: 'success',
+        };
+        return data;
 
       } catch (err) {
           let data = {
@@ -204,6 +350,31 @@ export class TestsService {
           return data;
       }
     };
+
+    async saveStudentResult(payload): Promise<any>{
+        try {
+            const newResult = this.resultRepository.create({
+                student: payload.student,
+                testId: payload.testId,
+                startDate: payload.startExamDateTime,
+                endDate: payload.endExamDateTime,
+                serverEndDate: payload.endExamDateTime,
+                duration: payload.duration,
+                totalScored: payload.totalScored,
+                totalCount: payload.totalCount,
+                totalMarks: payload.totalMarks,
+                questionTestIds: payload.questionTestIds,
+                user : payload.user,
+                test: payload.test,
+            });
+            const savedResult = await this.resultRepository.save(newResult);
+
+            return savedResult;
+        } catch (error) {
+            console.error('Error saving student result:', error);
+            throw new Error('Unable to save student result.');
+        }
+    }
 
     async getQuestionTestsAssign(testId: number): Promise<any> {
         try{

@@ -8,4 +8,9 @@ export class UsersController {
     getDashboardData(@Param('user_id', ParseIntPipe) user_id: number) {
         return this.usersService.getUserDashboardData(user_id);
     }
+
+    @Get('/:user_id/results')
+    getUserResults(@Param('user_id', ParseIntPipe) user_id: number) {
+        return this.usersService.getUserResults(user_id);
+    }
 }

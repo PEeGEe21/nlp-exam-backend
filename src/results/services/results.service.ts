@@ -88,7 +88,7 @@ export class ResultsService {
         } catch (err) {}
     }
 
-    async getResultByStudentTestResult(test_id: number, student_id: number, result_id: number): Promise<any | undefined> {
+    async getResultByStudentTestResult(result_id: number, test_id: number, student_id: number, ): Promise<any | undefined> {
         try {
 
             const test = await this.testRepository.findOne({where: {id: test_id}});
