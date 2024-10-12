@@ -5,6 +5,7 @@ import { DifficultyTypesService } from 'src/difficulty-types/services/difficulty
 import { OptionTypesService } from 'src/option-types/services/option-types.service';
 import { Answer } from 'src/typeorm/entities/Answer';
 import { DifficultyType } from 'src/typeorm/entities/DifficultyType';
+import { Hint } from 'src/typeorm/entities/Hint';
 import { OptionType } from 'src/typeorm/entities/OptionType';
 import { Question } from 'src/typeorm/entities/Question';
 import { UsersService } from 'src/users/services/users.service';
@@ -23,6 +24,7 @@ export class QuestionsService {
         @InjectRepository(DifficultyType) private difficultyRepository: Repository<DifficultyType>,
         @InjectRepository(Question) private questionsRepository: Repository<Question>,
         @InjectRepository(Answer) private answersRepository: Repository<Answer>,
+        @InjectRepository(Hint) private hintsRepository: Repository<Hint>,
         @InjectRepository(OptionType) private readonly optionTypeRepository: Repository<OptionType>,
 
     ) {}
@@ -39,11 +41,25 @@ export class QuestionsService {
         return res;
     }
 
+    async getInitialData() {
+        const optionTypes = await this.optionTypeRepository.find({});
+        const difficulties = await this.difficultyRepository.find({});
+    
+        const res = {
+            success: 'success',
+            message: 'successful',
+            optionTypes,
+            difficulties,
+        };
+
+        return res;
+    }
+
     async getQuestionById(id: number): Promise<any | undefined> {
         try {
             const question = await this.questionsRepository.findOne({
                 where: { id },
-                relations: ['answers', 'difficulty', 'optionType'],
+                relations: ['answers', 'difficulty', 'optionType', 'hints'],
             });
 
             if (!question)
@@ -59,6 +75,8 @@ export class QuestionsService {
     }
 
     async createQuestion(questionData: Partial<Question>): Promise<any> {
+        // console.log(questionData)
+        // return;
         const user = await this.usersService.getUserAccountById(questionData.userId)
 
         if (!user) {
@@ -100,6 +118,9 @@ export class QuestionsService {
             if (questionData.answers){
                 await this.createAnswers(questionData, saveNewQuestion);
             }
+            if (questionData.hints){
+                await this.createHints(questionData, saveNewQuestion);
+            }
             console.log(`Question ${questionData.question} has been created`);
             let data = {
                 success: 'success',
@@ -127,6 +148,18 @@ export class QuestionsService {
         }
     }
 
+    async createHints(data, question){
+        for (const hint of data.hints) {
+            const newHint = this.hintsRepository.create({
+                question: question,
+                content: hint.content,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
+            await this.hintsRepository.save(newHint);
+        }
+    }
+
     async updateQuestion(id: number, questionData: Partial<Question>): Promise<any> {
         try{
             const question = await this.questionsRepository.findOne({ 
@@ -139,7 +172,7 @@ export class QuestionsService {
             }
 
             const updatedFields = Object.keys(questionData).reduce((acc, key) => {
-                if (key !== 'answers' && questionData[key] !== undefined) {
+                if (key !== 'answers' && key !== 'hints' && questionData[key] !== undefined) {
                     acc[key] = questionData[key];
                 }
                 return acc;
@@ -184,6 +217,33 @@ export class QuestionsService {
                                 updatedAt: new Date(),
                             });
                             await this.answersRepository.save(newAnswer);
+                        }
+                    }
+                }
+
+                if (questionData.hints) {
+    
+                    for (const hintData of questionData.hints) {
+                        if(hintData.id > 0){
+                            const existingHint =  await this.hintsRepository.findOne({
+                                where: { id : hintData.id},
+                            });
+                            if (existingHint) {
+                                const id = hintData.id;
+                                await this.hintsRepository.update({id}, {
+                                    content: hintData.content,
+                                });
+                            } else {
+                                throw new NotFoundException('Answer not found');
+                            }
+                        } else{    
+                            const newHint = this.hintsRepository.create({
+                                question: question,
+                                content: hintData.content,
+                                createdAt: new Date(),
+                                updatedAt: new Date(),
+                            });
+                            await this.hintsRepository.save(newHint);
                         }
                     }
                 }

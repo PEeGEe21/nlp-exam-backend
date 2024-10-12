@@ -39,19 +39,33 @@ export class SeederService {
   ) {}
 
   async seedOptionTypes() {
-    const difficulties = [
-      { id: 1, title: 'MUlti Choice', description: null },
-    ];
+    const questionTypes = [
+      {
+          description: "An option type where you can choose on in the list of options", 
+          id: 1, 
+          title: "Multiple Choice Single Answer"
+      },
+      {
+          description: "An option type where explanations are required as answer.", 
+          id: 2, 
+          title: "Subjective Question"
+      },
+      {
+          description: "An option type where one can give their own answer", 
+          id: 3, 
+          title: "Theoretical Question"
+      },
+    ]
 
-    for (const difficulty of difficulties) {
-      const existingDifficulty = await this.optionTypeRepository.findOne({ where: { id: difficulty.id } });
-      if (!existingDifficulty) {
-        const newDifficulty = this.optionTypeRepository.create({
-          ...difficulty,
+    for (const questionType of questionTypes) {
+      const existingQuestionType = await this.optionTypeRepository.findOne({ where: { id: questionType.id } });
+      if (!existingQuestionType) {
+        const newQuestionType = this.optionTypeRepository.create({
+          ...questionType,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
-        await this.optionTypeRepository.save(newDifficulty);
+        await this.optionTypeRepository.save(newQuestionType);
         // console.log(`Difficulty ${difficulty.title} has been seeded`);
       }
     }

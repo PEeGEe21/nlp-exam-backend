@@ -15,6 +15,7 @@ import { DifficultyType } from './DifficultyType';
 import { OptionType } from './OptionType';
 import { Answer } from './Answer';
 import { QuestionTest } from './QuestionTest';
+import { Hint } from './Hint';
 
   @Entity('questions')
   @Index('index_question', ['userId'])
@@ -87,6 +88,9 @@ import { QuestionTest } from './QuestionTest';
 
     @OneToMany(() => Answer, (answer) => answer.question)
     answers: Answer[];
+
+    @OneToMany(() => Hint, (hint) => hint.question)
+    hints: Hint[];
 
   }
   

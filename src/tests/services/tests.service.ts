@@ -14,6 +14,7 @@ import { SaveStudentTestDto } from '../dtos/save-student-test.dto';
 import { Student } from 'src/typeorm/entities/Student';
 import { Result } from 'src/typeorm/entities/Result';
 import { ResultsScore } from 'src/typeorm/entities/ResultsScore';
+import { AnswerCheckService } from 'src/core/utils/AnswerCheckService';
 
 @Injectable()
 export class TestsService {
@@ -22,6 +23,7 @@ export class TestsService {
         private usersService: UsersService,
         private difficultyService: DifficultyTypesService,
         private optionService: OptionTypesService,
+        private answerCheckService: AnswerCheckService,
 
         @InjectRepository(Student) private studentsRepository: Repository<Student>,
         @InjectRepository(Question) private questionsRepository: Repository<Question>,
@@ -47,7 +49,7 @@ export class TestsService {
 
     async getAllStudentTests() {
       const all_tests = await this.testsRepository.find({
-        where: {totalQuestions: MoreThan(0)}, 
+        where: {totalQuestions: MoreThan(0), isPublished: 1}, 
         order: {
             createdAt: 'DESC', // Sort by creation date in descending order
         },
@@ -162,6 +164,8 @@ export class TestsService {
     async saveStudentTest(test_id: number, studentTestData: SaveStudentTestDto): Promise<any> {
         console.log(studentTestData)
 
+        // return;
+
       const user = await this.usersService.getUserAccountById(studentTestData.user_id);
       if(!user){
         return {
@@ -203,7 +207,7 @@ export class TestsService {
                 id: Number(questionTestId),
                 testId: test.id,
               },
-              relations: ['questionRelation', 'questionRelation.answers'],
+              relations: ['questionRelation', 'questionRelation.answers',  'questionRelation.hints'],
             });
           
             if (questionTest) {
@@ -212,18 +216,36 @@ export class TestsService {
                 let isCorrect = false;
                 let correctAnswer = '';
 
-                for (const answer of question.answers){
-                    if(answer.id === Number(selectedOptionId)){
-                        selectedAnswer = answer;
-                        if(selectedAnswer.isCorrect === 1){
-                            isCorrect = true;
-                            totalScored += questionTest.mark
+                if(questionTest.optionAnswerTypeId === 1  && question.optionTypeId === 1){
+
+                    for (const answer of question.answers){
+                        if(answer.id === Number(selectedOptionId)){
+                            selectedAnswer = answer;
+                            if(selectedAnswer.isCorrect === 1){
+                                isCorrect = true;
+                                totalScored += questionTest.mark
+                            }
+                        }
+                        if (answer.isCorrect) {
+                            correctAnswer = answer.content;
                         }
                     }
-                    if (answer.isCorrect) {
-                        correctAnswer = answer.content;
-                    }
+
                 }
+
+                // checker for theory questions
+                // if(questionTest.optionAnswerTypeId === 3 && question.optionTypeId === 3){
+                //     // ai api for answer check
+                //     const hints = question.hints;
+                //     const isCorrect = await this.answerCheckService.checkTheoreticalAnswer(String(selectedOptionId), hints);
+
+                //     if (isCorrect) {
+                //         // Update the answer as correct
+                //     } else {
+                //         // Handle incorrect answer
+                //     }
+                // }
+
               
                 // console.log(question);   
                 console.log(`Question ID: ${question}, Selected Option ID: ${selectedOptionId}`);

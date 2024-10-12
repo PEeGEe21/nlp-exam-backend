@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
@@ -48,6 +49,7 @@ import { SanitizerService } from './core/utils/SanitizerService';
     }),
     TypeOrmModule.forFeature([User, Profile, DifficultyType, Question, Result, QuestionTest, ResultsScore, Test, Student, OptionType, DifficultyType, Answer]), // Ensure Role is added here
     AuthModule, 
+    HttpModule,
     UsersModule, QuestionsModule, TestsModule, ResultsModule, DifficultyTypesModule, OptionTypesModule
   ],
   controllers: [AppController],

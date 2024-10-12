@@ -13,13 +13,14 @@ import { SeederService } from 'src/seeder/seeder.service';
 import { OptionTypesModule } from 'src/option-types/option-types.module';
 import { OptionType } from 'src/typeorm/entities/OptionType';
 import { SanitizerService } from 'src/core/utils/SanitizerService';
+import { Hint } from 'src/typeorm/entities/Hint';
 
 @Module({
   imports: [
     UsersModule,
     DifficultyTypesModule,
     OptionTypesModule,
-    TypeOrmModule.forFeature([User, Profile, DifficultyType, Question, Answer, OptionType])
+    TypeOrmModule.forFeature([User, Profile, DifficultyType, Question, Answer, OptionType, Hint])
   ],
   providers: [QuestionsService, SanitizerService],
   controllers: [QuestionsController],

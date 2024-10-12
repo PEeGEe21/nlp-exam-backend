@@ -15,6 +15,11 @@ export class QuestionsController {
     getQuestion(@Param('id', ParseIntPipe) id: number) {
     return this.questionService.getQuestionById(id);
     }
+    @Get('/main/initial-data')
+    getInitialData() {
+        return this.questionService.getInitialData();
+    }
+
 
     @Post('/create')
     createQuestion(@Body() questionData: Partial<Question>) {
