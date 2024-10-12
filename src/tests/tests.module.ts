@@ -17,6 +17,8 @@ import { Test } from 'src/typeorm/entities/Test';
 import { Student } from 'src/typeorm/entities/Student';
 import { Result } from 'src/typeorm/entities/Result';
 import { ResultsScore } from 'src/typeorm/entities/ResultsScore';
+import { AnswerCheckService } from 'src/core/utils/AnswerCheckService';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -24,10 +26,11 @@ import { ResultsScore } from 'src/typeorm/entities/ResultsScore';
     QuestionsModule,
     DifficultyTypesModule,
     OptionTypesModule,
+    HttpModule,
     TypeOrmModule.forFeature([User, Profile, DifficultyType, Question, Answer, OptionType, QuestionTest, Test, Student, Result, ResultsScore])
   ],
   controllers: [TestsController],
-  providers: [TestsService],
+  providers: [TestsService, AnswerCheckService],
   exports: [TestsService]
 })
 export class TestsModule {}

@@ -23,7 +23,7 @@ export class TestsService {
         private usersService: UsersService,
         private difficultyService: DifficultyTypesService,
         private optionService: OptionTypesService,
-        private answerCheckService: AnswerCheckService,
+        private readonly answerCheckService: AnswerCheckService,
 
         @InjectRepository(Student) private studentsRepository: Repository<Student>,
         @InjectRepository(Question) private questionsRepository: Repository<Question>,
