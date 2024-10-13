@@ -14,6 +14,7 @@ import { User } from 'src/typeorm/entities/User';
 import { ResultsScore } from 'src/typeorm/entities/ResultsScore';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
+import { AuthService } from 'src/auth/services/auth.service';
 
 @Injectable()
 export class SeederService {
@@ -21,6 +22,7 @@ export class SeederService {
 
     // export the service
     private usersService: UsersService,
+    private authService: AuthService,
     private difficultyService: DifficultyTypesService,
     private optionService: OptionTypesService,
 

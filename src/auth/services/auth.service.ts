@@ -146,6 +146,58 @@ export class AuthService {
           message: 'Account was successfully created',
         };
     }
+
+    async signUpAsAdmin(
+        userdetails: CreateUserDto,
+      ): Promise<SignUpResponseDto> {
+    
+        if(!userdetails.email || !userdetails.password){
+            throw new BadRequestException(
+              `password and email fields are required`,
+            );
+        }
+    
+        // console.log('herer')
+    
+        await this.checkUserAccountEmailExists(userdetails.email);
+    
+        if (userdetails.password) {
+          const saltOrRounds = 10;
+          userdetails.password = await bcrypt.hash(
+            userdetails.password,
+            saltOrRounds,
+          );
+        }
+
+        userdetails.user_role = 'admin';
+        const user: any = await this.createUser(userdetails);
+    
+        const userprofilepayload = {
+          user: user,
+          email: user.email,
+          profile_created: 1
+        };
+    
+        const userProfileDetails = await this.createUserProfile(user.id, userprofilepayload)
+    
+        await this.updateUserProfile(user.id,userProfileDetails)
+        const payload = {
+          email: user.email,
+          sub: user.id,
+        };
+        user.profile = userProfileDetails
+        const profile = userProfileDetails
+    
+        delete user.password;
+    
+        return {
+          success: "success",
+          access_token: this.jwtService.sign(payload),
+          user,
+          // profile:profile,
+          message: 'Account was successfully created',
+        };
+    }
     
     async createUser(userDetails: CreateUserDto) {
         const newUser = this.userRepository.create({

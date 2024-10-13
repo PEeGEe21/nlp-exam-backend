@@ -20,4 +20,11 @@ export class AuthController {
     ): Promise<SignUpResponseDto> {
         return this.authService.signUp(userSignupDto);
     }
+
+    @Post('/admin-signup')
+    async signUpAsAdmin(
+        @Body() userSignupDto: any,
+    ): Promise<SignUpResponseDto> {
+        return this.authService.signUpAsAdmin(userSignupDto);
+    }
 }

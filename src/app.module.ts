@@ -30,6 +30,7 @@ import { Answer } from './typeorm/entities/Answer';
 import { OptionTypesModule } from './option-types/option-types.module';
 import { SanitizerService } from './core/utils/SanitizerService';
 import { AnswerCheckService } from './core/utils/AnswerCheckService';
+import { AuthService } from './auth/services/auth.service';
 
 @Module({
   imports: [
@@ -54,6 +55,6 @@ import { AnswerCheckService } from './core/utils/AnswerCheckService';
     UsersModule, QuestionsModule, TestsModule, ResultsModule, DifficultyTypesModule, OptionTypesModule
   ],
   controllers: [AppController],
-  providers: [AppService, SeederService, SanitizerService, AnswerCheckService],
+  providers: [AppService, SeederService, SanitizerService, AnswerCheckService, AuthService],
 })
 export class AppModule {}
