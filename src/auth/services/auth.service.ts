@@ -138,6 +138,7 @@ export class AuthService {
 
         // if()
         const student = await this.createUserStudent(user);
+        console.log(student, 'student')
     
         await this.updateUserProfile(user.id,userProfileDetails)
         const payload = {
@@ -192,7 +193,10 @@ export class AuthService {
           );
         }
 
-        userdetails.user_role = 'admin';
+        if(userdetails.user_role == 'admin' || !userdetails.user_role){
+          userdetails.user_role = 'admin';
+        }
+
         const user: any = await this.createUser(userdetails);
     
         const userprofilepayload = {
@@ -261,6 +265,8 @@ export class AuthService {
         const newStudent = this.studentRepository.create({
           user,
         });
+
+        console.log(newStudent, 'aievoivowmvomeovm')
 
         return this.studentRepository.save(newStudent);
     }

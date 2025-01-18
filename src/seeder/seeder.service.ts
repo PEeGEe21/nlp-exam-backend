@@ -40,6 +40,35 @@ export class SeederService {
 
   ) {}
 
+  async seedAdmin() {
+    // await this.userRepository.delete(13);
+
+    const users = [
+      { 
+        fname: process.env.SUPER_FIRSTNAME, 
+        lname: process.env.SUPER_LASTNAME, 
+        username: process.env.SUPER_USERNAME, 
+        email: process.env.SUPER_EMAIL, 
+        password: process.env.SUPER_PASSWORD, 
+        cpassword: process.env.SUPER_PASSWORD,
+        user_role: process.env.SUPER_SIGNUP
+      },      
+    ];
+
+    for (const user of users) {
+      const savedData = await this.authService.signUpAsAdmin(user);
+      if(savedData.success == 'success'){
+        const data = {
+            success: 'success',
+            message: 'User created successfully',
+        }
+        return data
+      }
+    }
+
+    console.log('Admin seeding completed');
+  }
+
   async seedOptionTypes() {
     const questionTypes = [
       {

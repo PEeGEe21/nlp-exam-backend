@@ -197,7 +197,7 @@ export class UsersService {
 
     async createUser(userdetails: CreateUserDto){
         let savedData
-        if(userdetails.user_role == UserRoles['student']){
+        if(userdetails.user_role == 'student'){
              savedData = await this.authService.signUp(userdetails);
         } else{
             savedData = await this.authService.signUpAsAdmin(userdetails);
@@ -328,7 +328,7 @@ export class UsersService {
     }
 
     async getUserResults(user_id: number): Promise<any | undefined> {
-        const user = await this.userRepository.findOne({where: { id: user_id }});
+        const user = await this.userRepository.findOne({where: { id: user_id }, relations: ['profile']});
         if(!user){
             return{
                 error: 'error',
@@ -345,10 +345,66 @@ export class UsersService {
             relations: ['user', 'test', 'student', 'student.user'],
         });
 
+        const user_data = {
+            id: user?.id,
+            firstname: user?.profile?.firstname,
+            lastname: user?.profile?.lastname,
+            username: user?.username,
+            email: user?.email
+        }
+
         const res = {
             success: 'success',
             message: 'successful',
-            results
+            results,
+            user: user_data
+        };
+
+        return res;
+    }
+
+    async getStudentUsers(): Promise<any | undefined> {
+        // const students = await this.studentRepository
+        //     .createQueryBuilder('student')
+        //     .leftJoinAndSelect('student.user', 'user') // Join the 'user' relation
+        //     .leftJoinAndSelect('user.profile', 'profile') // Join the 'profile' relation of 'user'
+        //     .where('user') // Filter by user_role
+        //     .where('user.user_role = :role', { role: 'student' }) // Filter by user_role
+        //     .orderBy('student.createdAt', 'DESC') // Order by student creation date
+        //     .getMany();
+      
+        const students = await this.studentRepository.find({
+            where: {
+                user: {
+                    user_role: 'student'
+                }
+            },
+            order: {
+                createdAt: 'DESC',
+            },
+            relations: ['user', 'user.profile'], // Add user.profile to get firstname/lastname
+        });
+
+        const updatedStudents =  students.map(student => ({
+            id: student.id,
+            createdAt: student.createdAt,
+            user: {
+                id: student.user?.id,
+                username: student.user?.username,
+                email: student.user?.email,
+                firstname: student.user?.profile?.firstname,
+                lastname: student.user?.profile?.lastname,
+                user_role: student.user?.user_role,
+            },
+        }));
+
+
+        // console.log(students)
+
+        const res = {
+            success: 'success',
+            message: 'successful',
+            students: updatedStudents
         };
 
         return res;

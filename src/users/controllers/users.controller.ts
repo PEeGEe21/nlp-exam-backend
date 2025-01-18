@@ -45,6 +45,11 @@ export class UsersController {
         return this.usersService.getUserResults(user_id);
     }
 
+    @Get('/students')
+    getStudentUsers() {
+        return this.usersService.getStudentUsers();
+    }
+
     @Post('/update-active-status/:user_id')
     async updateUserStatus(
         @Param('user_id', ParseIntPipe) user_id: number,
