@@ -36,8 +36,8 @@ async function bootstrap() {
   // await seederService.seedAdmin();
   // await seederService.seedResultsScores();
   // await seederService.seedResults();
-  // await seederService.seedDifficulties();
-  // await seederService.seedOptionTypes();
+  await seederService.seedDifficulties();
+  await seederService.seedOptionTypes();
   // await seederService.seedQuestions();
   // await seederService.seedTests();
 

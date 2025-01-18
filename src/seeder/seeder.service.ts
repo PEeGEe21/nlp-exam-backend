@@ -56,6 +56,10 @@ export class SeederService {
     ];
 
     for (const user of users) {
+      const existingUser = await this.userRepository.findOne({ where: { email: user.email } });
+      if(existingUser){
+        return;
+      }
       const savedData = await this.authService.signUpAsAdmin(user);
       if(savedData.success == 'success'){
         const data = {
