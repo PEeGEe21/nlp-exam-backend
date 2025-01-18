@@ -80,11 +80,11 @@ export class SeederService {
           id: 1, 
           title: "Multiple Choice Single Answer"
       },
-      {
-          description: "An option type where explanations are required as answer.", 
-          id: 2, 
-          title: "Subjective Question"
-      },
+      // {
+      //     description: "An option type where explanations are required as answer.", 
+      //     id: 2, 
+      //     title: "Subjective Question"
+      // },
       {
           description: "An option type where one can give their own answer", 
           id: 3, 
