@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "./User";
 
 @Entity('students')
@@ -6,7 +6,11 @@ export class Student{
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => User)
+    @OneToOne(() => User, {
+        cascade: true,
+        eager: true,
+        onDelete: 'CASCADE'  // This will cascade both soft deletes and saves
+    })
     @JoinColumn({ name: 'user_id' })
     user: User;
 
@@ -15,4 +19,7 @@ export class Student{
 
     @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
     updatedAt: Date;
+
+    @DeleteDateColumn()
+    deletedAt: Date;
 }

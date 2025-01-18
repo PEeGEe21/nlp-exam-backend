@@ -40,6 +40,9 @@ export class Test {
   @Column({ type: 'int', name: 'view_correct_answer',  default: 0 })
   viewCorrectAnswer: number;
 
+  @Column({ type: 'int', name: 'show_hints',  default: 0 })
+  showHints: number;
+
   @Column({ type: 'int', name: 'auto_publish',  default: 0 })
   autoPublish: number;
 

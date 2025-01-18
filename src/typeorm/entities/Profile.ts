@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, DeleteDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './User';
 
 @Entity({ name: 'user_profiles' })
@@ -52,5 +52,8 @@ export class Profile {
     default: 0,
   })
   profile_created: number;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 
 }

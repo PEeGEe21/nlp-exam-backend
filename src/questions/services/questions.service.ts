@@ -8,6 +8,7 @@ import { DifficultyType } from 'src/typeorm/entities/DifficultyType';
 import { Hint } from 'src/typeorm/entities/Hint';
 import { OptionType } from 'src/typeorm/entities/OptionType';
 import { Question } from 'src/typeorm/entities/Question';
+import { QuestionTest } from 'src/typeorm/entities/QuestionTest';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 
@@ -23,6 +24,7 @@ export class QuestionsService {
 
         @InjectRepository(DifficultyType) private difficultyRepository: Repository<DifficultyType>,
         @InjectRepository(Question) private questionsRepository: Repository<Question>,
+        @InjectRepository(QuestionTest) private questionsTestRepository: Repository<QuestionTest>,
         @InjectRepository(Answer) private answersRepository: Repository<Answer>,
         @InjectRepository(Hint) private hintsRepository: Repository<Hint>,
         @InjectRepository(OptionType) private readonly optionTypeRepository: Repository<OptionType>,
@@ -171,15 +173,21 @@ export class QuestionsService {
                 throw new NotFoundException('Question not found');
             }
 
-            const updatedFields = Object.keys(questionData).reduce((acc, key) => {
+            const sanitizedQuestion = this.sanitizerService.sanitizeInput(questionData.question);
+
+            const updatedFields: Record<string, any> = Object.keys(questionData).reduce((acc, key) => {
                 if (key !== 'answers' && key !== 'hints' && questionData[key] !== undefined) {
                     acc[key] = questionData[key];
                 }
                 return acc;
             }, {});
 
+            updatedFields.questionPlain = sanitizedQuestion??null
+
             const saveNewQuestion = await this.questionsRepository.update({ id }, updatedFields);
-    
+            const questionTest = await this.questionsTestRepository.findOne({
+                where: { questionId: question.id },
+            });
             // const saveNewQuestion = await this.questionsRepository.update(
             //     { id },
             //     {   
@@ -247,11 +255,24 @@ export class QuestionsService {
                         }
                     }
                 }
+
+
                 const updatedQuestions = await this.questionsRepository.findOne({
                     where: { id },
                     relations: ['answers'],
                 });
             
+                console.log(questionTest)
+                if(questionTest){
+                    let question_test_id = Number(questionTest.id);
+                    const updatedQuestionTest = {
+                        question: updatedQuestions.question,
+                        optionAnswerTypeId: updatedQuestions.optionTypeId
+                    }
+                    const updated = await this.questionsTestRepository.update({ id:question_test_id }, updatedQuestionTest);
+                    console.log(updated, updatedQuestionTest)
+                }
+
                 let data = {
                     success: 'success',
                     message: 'Question updated successfully',

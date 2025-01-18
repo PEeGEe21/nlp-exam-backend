@@ -35,9 +35,22 @@ export class AuthService {
         return this.loginUser(user, password);
     }
 
+    async signInAs(loginDto: any): Promise<LoginResponseDto> {
+      const { email } = loginDto;
+      const user = await this.usersService.getUserAccountByEmail(email);
+      if (!user)
+          throw new HttpException('Incorrrect Email or Password.', HttpStatus.BAD_REQUEST);
+
+      await this.usersService.checkAccountActiveStatus(user.id);
+
+      // if (user) return this.loginUser(user, false);
+      return this.loginUser(user, false);
+  }
+
+
     private async loginUser(
         user: any,
-        password: string,
+        password: any,
       ): Promise<LoginResponseDto> {
         
         try {
@@ -50,17 +63,20 @@ export class AuthService {
             const userPassword = await this.usersService.getUserAccountPassword(
                 user.email,
             );
-        
-            const isCorrectPassword = await bcrypt.compare(password, userPassword);
 
-            if (!isCorrectPassword) {
-              return {
-                  error: 'Error',
-                  message: 'Incorrect Password'
+            if(password){
+        
+              const isCorrectPassword = await bcrypt.compare(password, userPassword);
+
+              if (!isCorrectPassword) {
+                return {
+                    error: 'Error',
+                    message: 'Incorrect Password'
+                }
+                  // throw new BadRequestException(
+                  //     'SignIn Failed!, Incorrect login credentials',
+                  // );
               }
-                // throw new BadRequestException(
-                //     'SignIn Failed!, Incorrect login credentials',
-                // );
             }
             
             const payload = {
@@ -99,6 +115,7 @@ export class AuthService {
         // console.log('herer')
     
         await this.checkUserAccountEmailExists(userdetails.email);
+        await this.checkUserAccountUsernameExists(userdetails.email);
     
         if (userdetails.password) {
           const saltOrRounds = 10;
@@ -112,11 +129,14 @@ export class AuthService {
         const userprofilepayload = {
           user: user,
           email: user.email,
-          profile_created: 1
+          profile_created: 1,
+          lastname: userdetails.lname??'',
+          firstname: userdetails.fname??'',
         };
     
         const userProfileDetails = await this.createUserProfile(user.id, userprofilepayload)
 
+        // if()
         const student = await this.createUserStudent(user);
     
         await this.updateUserProfile(user.id,userProfileDetails)
@@ -160,7 +180,10 @@ export class AuthService {
         // console.log('herer')
     
         await this.checkUserAccountEmailExists(userdetails.email);
-    
+
+        await this.checkUserAccountUsernameExists(userdetails.email);
+  
+
         if (userdetails.password) {
           const saltOrRounds = 10;
           userdetails.password = await bcrypt.hash(
@@ -175,8 +198,12 @@ export class AuthService {
         const userprofilepayload = {
           user: user,
           email: user.email,
-          profile_created: 1
+          profile_created: 1,
+          lastname: userdetails.lname??'',
+          firstname: userdetails.fname??'',
         };
+
+
     
         const userProfileDetails = await this.createUserProfile(user.id, userprofilepayload)
     
@@ -207,6 +234,15 @@ export class AuthService {
         return this.userRepository.save(newUser);
     }
 
+    async hashPassword(password){
+      const saltOrRounds = 10;
+      const hashedPassword = await bcrypt.hash(
+        password,
+        saltOrRounds,
+      );
+      return hashedPassword;
+    }
+
     async updateUserProfile(id: number, profile: Profile) {
       const user = await this.usersService.getUserAccountById(id);
       user.profile = profile;
@@ -235,6 +271,16 @@ export class AuthService {
         if (userAccountExists) {
           throw new ConflictException(
             'An account with this email exists, use a different email',
+          );
+        }
+    }
+
+    async checkUserAccountUsernameExists(username: string): Promise<void> {
+        const userAccountExists: boolean =
+          await this.usersService.checkUserAccountUsernameExists(username);
+        if (userAccountExists) {
+          throw new ConflictException(
+            'An account with this username exists, use a different username',
           );
         }
     }

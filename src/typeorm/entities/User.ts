@@ -1,5 +1,6 @@
 import {
   Column,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToMany,
@@ -37,9 +38,16 @@ export class User {
   @Column({ default: true })
   is_active: boolean;
 
-  @OneToOne(() => Profile)
+  @OneToOne(() => Profile, {
+    cascade: true,
+    eager: true,
+    onDelete: 'CASCADE'
+  })
   @JoinColumn()
   profile: Profile;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   constructor(partial: Partial<User>) {
     Object.assign(this, partial);

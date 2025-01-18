@@ -72,6 +72,9 @@ export class ResultsService {
             const results = await this.resultsRepository.find({ 
                 where: { testId: test.id },
                 relations: ['user', 'test', 'student', 'student.user'],
+                order: {
+                    createdAt: 'DESC',
+                }
             });
 
             console.log(results, 'result');
@@ -112,7 +115,7 @@ export class ResultsService {
             const result = await this.resultsRepository.findOne({
                 where: { id: result_id },
                 // where: {test: test, student: student},
-                relations: ['user', 'test', 'student', 'student.user', 'scores', 'scores.questionTest', 'scores.question', 'scores.question.difficulty', 'scores.question.answers'],
+                relations: ['user', 'test', 'student', 'student.user', 'scores', 'scores.questionTest', 'scores.question', 'scores.question.difficulty', 'scores.question.answers', 'scores.question.hints'],
             });
 
             console.log(result);

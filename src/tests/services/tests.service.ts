@@ -14,6 +14,7 @@ import { SaveStudentTestDto } from '../dtos/save-student-test.dto';
 import { Student } from 'src/typeorm/entities/Student';
 import { Result } from 'src/typeorm/entities/Result';
 import { ResultsScore } from 'src/typeorm/entities/ResultsScore';
+import { Hint } from 'src/typeorm/entities/Hint';
 import { AnswerCheckService } from 'src/core/utils/AnswerCheckService';
 
 @Injectable()
@@ -28,6 +29,7 @@ export class TestsService {
         @InjectRepository(Student) private studentsRepository: Repository<Student>,
         @InjectRepository(Question) private questionsRepository: Repository<Question>,
         @InjectRepository(QuestionTest) private questionsTestRepository: Repository<QuestionTest>,
+        @InjectRepository(Hint) private questionsHintRepository: Repository<Hint>,
         @InjectRepository(Test) private testsRepository: Repository<Test>,
         @InjectRepository(Result) private resultRepository: Repository<Result>,
         @InjectRepository(ResultsScore) private resultsScoreRepository: Repository<ResultsScore>,
@@ -35,7 +37,12 @@ export class TestsService {
     ) {}
 
     async getAllTests() {
-      const all_tests = await this.testsRepository.find({relations: ['user']});
+      const all_tests = await this.testsRepository.find({
+            relations: ['user'], 
+            order: {
+                createdAt: 'DESC',
+            }
+        });
 
     // await this.resetAllTests();
       const res = {
@@ -142,6 +149,11 @@ export class TestsService {
               instructions: testData.instructions,
               startDate: testData.startDate,
               endDate: testData.endDate,
+              shuffle: testData.shuffle,
+              shuffleAnswer: testData.shuffleAnswer,
+              viewCorrectAnswer: testData.viewCorrectAnswer,
+              showHints: testData.showHints,
+              autoPublish: testData.autoPublish,
               createdAt: new Date(),
               updatedAt: new Date(),
           });
@@ -215,12 +227,15 @@ export class TestsService {
                 let selectedAnswer;
                 let isCorrect = false;
                 let correctAnswer = '';
+                let mainAnswer = '';
 
-                if(questionTest.optionAnswerTypeId === 1  && question.optionTypeId === 1){
+                // if(questionTest.optionAnswerTypeId === 1  && question.optionTypeId === 1){
+                if(question.optionTypeId === 1){
 
                     for (const answer of question.answers){
                         if(answer.id === Number(selectedOptionId)){
                             selectedAnswer = answer;
+                            mainAnswer = selectedAnswer ? selectedAnswer.content : '';
                             if(selectedAnswer.isCorrect === 1){
                                 isCorrect = true;
                                 totalScored += questionTest.mark
@@ -234,19 +249,26 @@ export class TestsService {
                 }
 
                 // checker for theory questions
-                // if(questionTest.optionAnswerTypeId === 3 && question.optionTypeId === 3){
-                //     // ai api for answer check
-                //     const hints = question.hints;
-                //     const isCorrect = await this.answerCheckService.checkTheoreticalAnswer(String(selectedOptionId), hints);
+                if(question.optionTypeId === 3){
+                    // ai api for answer check
+                    if(selectedOptionId !== ''){
+                        const allHints  = await this.questionsHintRepository.find({where: {question : question}});
+                        console.log(allHints);
+                        const hintsArray = allHints.map(hint => String(hint.content));
+                        const getAnswer = await this.answerCheckService.checkTheoreticalAnswer(question.questionPlain, String(selectedOptionId), hintsArray);
 
-                //     if (isCorrect) {
-                //         // Update the answer as correct
-                //     } else {
-                //         // Handle incorrect answer
-                //     }
-                // }
+                        // console.log(isCorrect, 'is correct')
+                        mainAnswer = String(selectedOptionId);
+                        if(getAnswer.isCorrect){
+                            isCorrect = true;
+                            totalScored += questionTest.mark                        
+                        }
+                    }
+                    correctAnswer = question.answer_explanation;
+                }
 
               
+                // return
                 // console.log(question);   
                 console.log(`Question ID: ${question}, Selected Option ID: ${selectedOptionId}`);
                 totalMarks += questionTest.mark
@@ -259,7 +281,7 @@ export class TestsService {
                     test,
                     score: isCorrect ? questionTest.mark.toString() : '0',
                     scored: true,
-                    studentAnswer: selectedAnswer ? selectedAnswer.content : '',
+                    studentAnswer: mainAnswer ? mainAnswer : '',
                     isCorrect,
                     correctAnswer,
                     result: null,
@@ -272,6 +294,7 @@ export class TestsService {
 
             totalCount++;
         }
+        // return
         console.log(selectedOptions, answers)
         console.log(test_id, 
             studentTestData.startExamDateTime, 
@@ -484,7 +507,7 @@ export class TestsService {
                 where: {
                     testId: test.id
                 },
-                relations: ['questionRelation', 'questionRelation.answers']
+                relations: ['questionRelation', 'questionRelation.answers', 'questionRelation.hints']
             });
 
             console.log(questionTest);
@@ -770,6 +793,8 @@ export class TestsService {
             if (!exam) {
                 return { error: 'error', message: 'Exam not found' };
             }
+
+            await this.questionsTestRepository.delete({ testId: id });
 
             await this.testsRepository.delete(id);
             return { success: 'success', message: 'Exam deleted successfully' };

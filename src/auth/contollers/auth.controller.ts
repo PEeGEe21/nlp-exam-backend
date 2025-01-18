@@ -21,6 +21,12 @@ export class AuthController {
         return this.authService.signUp(userSignupDto);
     }
 
+    @HttpCode(HttpStatus.OK)
+    @Post('login-in-as')
+    async signInAs(@Body() signInDto: any): Promise<LoginResponseDto> {
+        return this.authService.signInAs(signInDto);
+    }
+
     @Post('/admin-signup')
     async signUpAsAdmin(
         @Body() userSignupDto: any,
