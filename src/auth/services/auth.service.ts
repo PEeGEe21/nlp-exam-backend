@@ -105,18 +105,21 @@ export class AuthService {
     async signUp(
         userdetails: CreateUserDto,
       ): Promise<SignUpResponseDto> {
+        try{
     
         if(!userdetails.email || !userdetails.password){
             throw new BadRequestException(
               `password and email fields are required`,
             );
         }
-    
-        // console.log('herer')
-    
+        userdetails.email = userdetails.email.toLowerCase();
+        
         await this.checkUserAccountEmailExists(userdetails.email);
-        await this.checkUserAccountUsernameExists(userdetails.email);
-    
+
+        if(userdetails.username){
+          await this.checkUserAccountUsernameExists(userdetails.username);
+        }
+
         if (userdetails.password) {
           const saltOrRounds = 10;
           userdetails.password = await bcrypt.hash(
@@ -130,8 +133,10 @@ export class AuthService {
           user: user,
           email: user.email,
           profile_created: 1,
-          lastname: userdetails.lname??'',
-          firstname: userdetails.fname??'',
+          lastname: userdetails?.lname??'',
+          firstname: userdetails?.fname??'',
+          state: userdetails?.state??'',
+          phonenumber: userdetails?.phonenumber??'',
         };
     
         const userProfileDetails = await this.createUserProfile(user.id, userprofilepayload)
@@ -166,12 +171,16 @@ export class AuthService {
           // profile:profile,
           message: 'Account was successfully created',
         };
+      } catch(err){
+
+      }
     }
 
     async signUpAsAdmin(
         userdetails: CreateUserDto,
       ): Promise<SignUpResponseDto> {
     
+        try{
         if(!userdetails.email || !userdetails.password){
             throw new BadRequestException(
               `password and email fields are required`,
@@ -179,11 +188,13 @@ export class AuthService {
         }
     
         // console.log('herer')
+        userdetails.email = userdetails.email.toLowerCase();
     
         await this.checkUserAccountEmailExists(userdetails.email);
 
-        await this.checkUserAccountUsernameExists(userdetails.email);
-  
+        if(userdetails.username){
+          await this.checkUserAccountUsernameExists(userdetails.username);
+        }
 
         if (userdetails.password) {
           const saltOrRounds = 10;
@@ -195,6 +206,7 @@ export class AuthService {
 
         if(userdetails.user_role == 'admin' || !userdetails.user_role){
           userdetails.user_role = 'admin';
+          await this.checkUserAccountStaffIdExists(userdetails.staffId);
         }
 
         const user: any = await this.createUser(userdetails);
@@ -203,11 +215,11 @@ export class AuthService {
           user: user,
           email: user.email,
           profile_created: 1,
-          lastname: userdetails.lname??'',
-          firstname: userdetails.fname??'',
+          lastname: userdetails?.lname??'',
+          firstname: userdetails?.fname??'',
+          phonenumber: userdetails?.phonenumber??'',
+          staffId: userdetails?.staffId??'',
         };
-
-
     
         const userProfileDetails = await this.createUserProfile(user.id, userprofilepayload)
     
@@ -228,6 +240,9 @@ export class AuthService {
           // profile:profile,
           message: 'Account was successfully created',
         };
+      } catch(err){
+
+      }
     }
     
     async createUser(userDetails: CreateUserDto) {
@@ -277,6 +292,26 @@ export class AuthService {
         if (userAccountExists) {
           throw new ConflictException(
             'An account with this email exists, use a different email',
+          );
+        }
+    }
+
+    async checkUserAccountStaffIdExists(staffId: string): Promise<void> {
+        const userAccountExists: boolean =
+          await this.usersService.checkUserAccountStaffIdExists(staffId);
+        if (userAccountExists) {
+          throw new ConflictException(
+            'An account with this staff id exists',
+          );
+        }
+    }
+
+    async checkUserAccountMatricIdExists(matricId: string): Promise<void> {
+        const userAccountExists: boolean =
+          await this.usersService.checkUserAccountMatricIdExists(matricId);
+        if (userAccountExists) {
+          throw new ConflictException(
+            'An account with this matric id exists',
           );
         }
     }

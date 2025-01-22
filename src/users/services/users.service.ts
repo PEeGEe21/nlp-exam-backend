@@ -395,6 +395,11 @@ export class UsersService {
                 firstname: student.user?.profile?.firstname,
                 lastname: student.user?.profile?.lastname,
                 user_role: student.user?.user_role,
+                level: student.user?.level,
+                matricNo: student.user?.matricNo,
+                staffId: student.user?.staffId,
+                department: student.user?.department,
+                profile: student.user?.profile,
             },
         }));
 
@@ -505,10 +510,22 @@ export class UsersService {
         const user = await this.userRepository.findOneBy({ email });    
         return user;
     }
+
     async getUserAccountByUsername(username: string) {
         const user = await this.userRepository.findOneBy({ username });    
         return user;
     }
+
+    async getUserAccountByStaffId(staffId: string) {
+        const user = await this.userRepository.findOneBy({ staffId });    
+        return user;
+    }
+
+    async getUserAccountByMatricId(matricNo: string) {
+        const user = await this.userRepository.findOneBy({ matricNo });    
+        return user;
+    }
+
     async getUserAccountById(id: number) {
         const user = await this.userRepository.findOneBy({ id });    
         return user;
@@ -524,6 +541,21 @@ export class UsersService {
         if (user) return true;
         return false;
     }
+
+    async checkUserAccountStaffIdExists(staffId: string): Promise<boolean> {
+        const user = await this.getUserAccountByStaffId(staffId);
+        if (user) return true;
+        return false;
+    }
+
+    async checkUserAccountMatricIdExists(matricId: string): Promise<boolean> {
+        const user = await this.getUserAccountByMatricId(matricId);
+        if (user) return true;
+        return false;
+    }
+
+    
+
     async checkUserAccountUsernameExists(username: string): Promise<boolean> {
         const user = await this.getUserAccountByUsername(username);
         if (user) return true;

@@ -1,4 +1,5 @@
 import { Column, DeleteDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Exclude, Expose, Transform } from 'class-transformer';
 import { User } from './User';
 
 @Entity({ name: 'user_profiles' })
@@ -25,6 +26,7 @@ export class Profile {
   })
   username?: string;
 
+  @Transform(({ value }) => value.toLowerCase())
   @Column()
   email: string;
 

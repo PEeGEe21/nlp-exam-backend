@@ -8,7 +8,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Transform } from 'class-transformer';
 import { Profile } from './Profile';
 
 @Entity({ name: 'users' })
@@ -19,8 +19,21 @@ export class User {
   @Column({ unique: true, nullable: true })
   username: string;
 
+  @Transform(({ value }) => value.toLowerCase())
   @Column({ unique: true})
   email: string;
+
+  @Column({ unique: true, nullable: true })
+  staffId: string;
+
+  @Column({ unique: true, nullable: true })
+  matricNo: string;
+
+  @Column({ nullable: true })
+  level: number;
+
+  @Column({ nullable: true })
+  department: string;
 
   @Exclude()
   @Column()
