@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { User } from './User';
 import { OptionType } from './OptionType';
@@ -55,10 +56,20 @@ export class Test {
   @Column({ type: 'int', name: 'duration_minutes' })
   durationMinutes: number;
 
-  @Column({ type: 'timestamp', name: 'start_date', nullable: true })
+  @Column({ type: 'timestamp', name: 'start_date', nullable: true, 
+    transformer: { 
+      to: (value) => value, 
+      from: (value) => moment(value).format('YYYY-MM-DD HH:mm:ss') 
+    }
+  })
   startDate: Date;
 
-  @Column({ type: 'timestamp', name: 'end_date', nullable: true })
+  @Column({ type: 'timestamp', name: 'end_date', nullable: true, 
+    transformer: { 
+      to: (value) => value, 
+      from: (value) => moment(value).format('YYYY-MM-DD HH:mm:ss') 
+    }
+  })
   endDate: Date;
 
   @Column({ type: 'int', name: 'type', default: 1 })

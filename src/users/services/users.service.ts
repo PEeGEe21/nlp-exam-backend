@@ -399,6 +399,7 @@ export class UsersService {
                 matricNo: student.user?.matricNo,
                 staffId: student.user?.staffId,
                 department: student.user?.department,
+                is_active: student.user?.is_active,
                 profile: student.user?.profile,
             },
         }));
