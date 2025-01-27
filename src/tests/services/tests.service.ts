@@ -486,7 +486,7 @@ export class TestsService {
             // console.log(err)
             return {
               error: 'error',
-              message: 'An error occurred while sending project invites'
+              message: 'An error occurred'
             }
         }
 
@@ -520,7 +520,7 @@ export class TestsService {
             // console.log(err)
             return {
               error: 'error',
-              message: 'An error occurred while sending project invites'
+              message: 'An error occurred'
             }
         }
 
@@ -650,10 +650,10 @@ export class TestsService {
             
             
         } catch (err) {
-            // console.log(err)
+            console.log(err)
             return {
                 error: 'error',
-                message: 'An error occurred while sending project invites'
+                message: 'Sorry, You cannot assign or remove'
             }
         }
 
