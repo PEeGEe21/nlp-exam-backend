@@ -12,6 +12,9 @@ export class DifficultyType{
     @Column({ type: 'longtext',  nullable: true })
     description: string;
 
+    @Column({ default: true })
+    is_active: boolean;
+    
     @Exclude()
     @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
     createdAt: Date;

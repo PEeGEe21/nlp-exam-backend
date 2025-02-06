@@ -44,8 +44,8 @@ export class QuestionsService {
     }
 
     async getInitialData() {
-        const optionTypes = await this.optionTypeRepository.find({});
-        const difficulties = await this.difficultyRepository.find({});
+        const optionTypes = await this.optionTypeRepository.find({where: {is_active: true}});
+        const difficulties = await this.difficultyRepository.find({where: {is_active: true}});
     
         const res = {
             success: 'success',
@@ -111,6 +111,7 @@ export class QuestionsService {
                 questionPlain: sanitizedQuestion??null,
                 marks: questionData.marks??Number(0),
                 instruction: null,
+                showHints: questionData.showHints,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             });

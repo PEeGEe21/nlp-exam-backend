@@ -53,6 +53,9 @@ import { Hint } from './Hint';
     @Column({ type: 'longtext', nullable: true })
     answer_explanation: string;
   
+    @Column({ type: 'int', name: 'show_hints',  default: 1 })
+    showHints: number;
+    
     // @Column({ type: 'int', name: 'option_answer_type_id', default: 1, nullable: true })
     // optionAnswerTypeId: number;
   

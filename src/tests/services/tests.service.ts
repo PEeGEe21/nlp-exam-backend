@@ -219,16 +219,19 @@ export class TestsService {
                 id: Number(questionTestId),
                 testId: test.id,
               },
-              relations: ['questionRelation', 'questionRelation.answers',  'questionRelation.hints'],
+              relations: ['questionRelation', 'questionRelation.answers',  'questionRelation.hints', 'questionRelation.optionType', 'questionRelation.difficulty'],
             });
           
+
             if (questionTest) {
+                // console.log(questionTest, 'questionTest')
                 let question = questionTest.questionRelation;
                 let selectedAnswer;
                 let isCorrect = false;
                 let correctAnswer = '';
                 let mainAnswer = '';
 
+                // console.log(question, 'question')
                 // if(questionTest.optionAnswerTypeId === 1  && question.optionTypeId === 1){
                 if(question.optionTypeId === 1){
 
@@ -253,15 +256,20 @@ export class TestsService {
                     // ai api for answer check
                     if(selectedOptionId !== ''){
                         const allHints  = await this.questionsHintRepository.find({where: {question : question}});
-                        console.log(allHints);
+                        // console.log(allHints);
                         const hintsArray = allHints.map(hint => String(hint.content));
-                        const getAnswer = await this.answerCheckService.checkTheoreticalAnswer(question.questionPlain, String(selectedOptionId), hintsArray);
+                        const getAnswer = await this.answerCheckService.checkTheoreticalAnswer(question.questionPlain, String(selectedOptionId), hintsArray, question, questionTest.mark);
 
-                        // console.log(isCorrect, 'is correct')
+                        console.log(getAnswer, isCorrect, 'is correct')
                         mainAnswer = String(selectedOptionId);
-                        if(getAnswer.isCorrect){
+                        if(getAnswer.isCorrect || (Number(getAnswer.score) > 0)){
                             isCorrect = true;
-                            totalScored += questionTest.mark                        
+                            var score = questionTest.mark
+                            if(getAnswer.score){
+                                score = getAnswer.score
+                                questionTest.mark = score
+                            }
+                            totalScored += score                        
                         }
                     }
                     correctAnswer = question.answer_explanation;
@@ -270,7 +278,7 @@ export class TestsService {
               
                 // return
                 // console.log(question);   
-                console.log(`Question ID: ${question}, Selected Option ID: ${selectedOptionId}`);
+                // console.log(`Question ID: ${question}, Selected Option ID: ${selectedOptionId}`);
                 totalMarks += questionTest.mark
                 questionTestIds.push(questionTest.id);
 
@@ -295,15 +303,15 @@ export class TestsService {
             totalCount++;
         }
         // return
-        console.log(selectedOptions, answers)
-        console.log(test_id, 
-            studentTestData.startExamDateTime, 
-            studentTestData.endExamDateTime, 
-            studentTestData.duration, 
-            totalCount, 
-            totalMarks, 
-            totalScored, 
-            questionTestIds)
+        // console.log(selectedOptions, answers)
+        // console.log(test_id, 
+        //     studentTestData.startExamDateTime, 
+        //     studentTestData.endExamDateTime, 
+        //     studentTestData.duration, 
+        //     totalCount, 
+        //     totalMarks, 
+        //     totalScored, 
+        //     questionTestIds)
 
         const payload = {
             student,

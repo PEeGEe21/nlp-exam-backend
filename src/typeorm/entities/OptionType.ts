@@ -11,6 +11,9 @@ export class OptionType{
     @Column({ type: 'longtext',  nullable: true })
     description: string;
 
+    @Column({ default: true })
+    is_active: boolean;
+    
     @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
     createdAt: Date;
 
